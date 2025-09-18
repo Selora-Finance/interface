@@ -9,3 +9,9 @@
 ## Git branching
 
 Dedicated branches must be created for each issue that's assigned to you. Ensure that each branch is checked out of the latest version of the `main` branch. The branch must be named according to the issue number. For example, `issue-1`
+
+## File naming
+
+- Components and UI files should be capitalized like so: `MainView.tsx`
+
+- Other files should retain camel-case naming
