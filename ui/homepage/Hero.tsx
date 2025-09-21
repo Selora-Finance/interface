@@ -13,9 +13,9 @@ export default function Hero() {
         Selora is a ve(3,3) AMM powering sustainable liquidity, governance, and incentives on Fluent network.
       </p>
 
-      <div className="mt-6 flex justify-center gap-4">
-        <Button>Join Waitlist</Button>
-        <Button>Read Docs</Button>
+      <div className="mt-6 flex justify-center gap-4 w-full flex-col md:flex-row">
+        <Button className="w-full md:w-1/7 py-3">Join Waitlist</Button>
+        <Button className="w-full md:w-1/7 py-3">Read Docs</Button>
       </div>
     </section>
   );
