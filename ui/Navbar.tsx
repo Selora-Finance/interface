@@ -6,7 +6,9 @@ import { FaXTwitter, FaDiscord } from 'react-icons/fa6';
 import { useState, useEffect, useMemo } from 'react';
 import Logo from '@/components/Logo';
 import { useWindowDimensions } from '@/hooks/utils';
-import { MAX_SCREEN_SIZES } from '@/constants';
+import { MAX_SCREEN_SIZES, Themes } from '@/constants';
+import { themeAtom } from '@/store';
+import { useAtom } from 'jotai';
 
 interface NavbarProps {
   defaultBg?: string; // Navbar background at top
@@ -18,6 +20,8 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const dimensions = useWindowDimensions();
+  const [theme] = useAtom(themeAtom);
+  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
@@ -32,16 +36,20 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
 
   return (
     <nav
-      className={`px-6 py-4 flex justify-between items-center fixed transition-all duration-500 w-full z-20 ${
+      className={`px-6 py-4 flex justify-between items-center fixed transition-all duration-500 w-dvw z-20 ${
         scrolled ? scrolledBg + ' shadow-lg' : defaultBg
-      } ${scrolled ? 'text-gray-900' : 'text-white'}`}
+      } ${scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'}`}
     >
       {/* Logo */}
       <div className="flex justify-center items-center gap-4">
         <Link href="/">
           <Logo className="w-10 h-10 rounded-full" />
         </Link>
-        <span className={`${scrolled ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}>Selora</span>
+        <span
+          className={`${scrolled || !isDarkMode ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}
+        >
+          Selora
+        </span>
       </div>
 
       {/* Desktop Nav */}
@@ -55,7 +63,11 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
       </div>
 
       <div className="flex justify-center items-center gap-12">
-        <div className={`md:flex justify-center gap-3 items-center hidden ${scrolled ? 'text-[#000]' : 'text-white'}`}>
+        <div
+          className={`md:flex justify-center gap-3 items-center hidden ${
+            scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'
+          }`}
+        >
           <a href="https://x.com/Selora_Fi" target="_blank">
             <FaXTwitter size={30} />
           </a>
@@ -72,7 +84,7 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
         <button
           onClick={() => setOpen(prev => !prev)}
           aria-label="Toggle Menu"
-          className={`p-2 rounded-sm ${scrolled ? 'bg-[#000] text-[#fff]' : 'bg-[#fff] text-[#000]'}`}
+          className={`p-2 rounded-sm ${scrolled || !isDarkMode ? 'bg-[#000] text-[#fff]' : 'bg-[#fff] text-[#000]'}`}
         >
           {!open ? <Menu /> : <X />}
         </button>
@@ -81,7 +93,7 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
       {/* Mobile Dropdown Menu */}
       {open && dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE && (
         <div
-          className={`absolute z-[9999] top-full left-0 w-full p-6 flex flex-col gap-4 md:hidden text-white transition-colors duration-1000 ${mobileBg}`}
+          className={`absolute z-[9999] top-full left-0 w-full p-6 flex flex-col gap-4 md:hidden transition-all duration-1000 ${mobileBg}`}
         >
           <Link href="#">Trade</Link>
           <Link href="#">Liquidity</Link>

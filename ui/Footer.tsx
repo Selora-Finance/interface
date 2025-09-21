@@ -1,9 +1,17 @@
+'use client';
+
 import { FaDiscord, FaXTwitter } from 'react-icons/fa6';
 import Link from 'next/link';
-import React from 'react';
+import React, { useMemo } from 'react';
 import Logo from '@/components/Logo';
+import { Themes } from '@/constants';
+import { themeAtom } from '@/store';
+import { useAtom } from 'jotai';
+import { Moon, Sun } from 'lucide-react';
 
 const Footer: React.FC = () => {
+  const [theme, setTheme] = useAtom(themeAtom);
+  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   return (
     <div className="flex justify-center mt-8 w-full py-4 md:py-16 px-4 md:px-16">
       <footer className="bg-orange-600 text-white p-10 rounded-2xl w-full">
@@ -25,6 +33,12 @@ const Footer: React.FC = () => {
               <a href="https://discord.gg/FgUyS6nnSx" target="_blank">
                 <FaDiscord size={30} />
               </a>
+              <button
+                className="w-8 h-8 rounded-full bg-[#fff] flex justify-center items-center text-[#000] px-1 py-1 ml-6 cursor-pointer"
+                onClick={() => setTheme(theme => (theme === Themes.DARK ? Themes.LIGHT : Themes.DARK))}
+              >
+                {isDarkMode ? <Sun size={28} /> : <Moon size={28} />}
+              </button>
             </div>
           </div>
 
