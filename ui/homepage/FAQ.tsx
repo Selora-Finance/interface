@@ -13,19 +13,28 @@ export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
 
   return (
-    <section className="w-full mx-auto px-4 py-12">
-      <h2 className="text-2xl font-bold text-center mb-6">FAQ</h2>
-      <div className="space-y-4 w-full">
+    <section className="w-full px-4 py-12 bg-[#F5EEE8]">
+      <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8">FAQ</h2>
+      <div className="space-y-4 w-full max-w-[980px] mx-auto">
         {faqs.map((faq, idx) => (
-          <div key={faq.q} className="rounded-lg p-4 cursor-pointer w-full bg-[#211b1b]">
+          <div
+            key={faq.q}
+            className="rounded-lg p-4 sm:p-6 cursor-pointer bg-white w-full shadow-md transition-shadow hover:shadow-lg"
+          >
             <button
-              className="w-full text-left font-medium flex justify-between items-center cursor-pointer"
+              className="w-full text-left font-medium flex justify-between items-center cursor-pointer text-base sm:text-lg"
               onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
             >
               {faq.q}
-              <span>{openIndex === idx ? <Minus /> : <Plus />}</span>
+              <span>{openIndex === idx ? <Minus size={20} /> : <Plus size={20} />}</span>
             </button>
-            {openIndex === idx && <p className="mt-2 text-gray-600">{faq.a}</p>}
+            <div
+              className={`overflow-hidden transition-all duration-300 ${
+                openIndex === idx ? 'max-h-40 mt-2' : 'max-h-0'
+              }`}
+            >
+              <p className="text-gray-600">{faq.a}</p>
+            </div>
           </div>
         ))}
       </div>

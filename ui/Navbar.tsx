@@ -34,14 +34,14 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
     <nav
       className={`px-6 py-4 flex justify-between items-center fixed transition-all duration-500 w-full z-20 ${
         scrolled ? scrolledBg + ' shadow-lg' : defaultBg
-      } ${scrolled ? 'text-gray-900' : 'text-white'}`}
+      } ${scrolled ? 'text-gray-900' : 'text-gray-900'}`}
     >
       {/* Logo */}
       <div className="flex justify-center items-center gap-4">
         <Link href="/">
           <Logo className="w-10 h-10 rounded-full" />
         </Link>
-        <span className={`${scrolled ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}>Selora</span>
+        <span className={`${scrolled ? 'text-[#000]' : 'text-[#000]'} font-bold text-3xl hidden md:block`}>Selora</span>
       </div>
 
       {/* Desktop Nav */}
@@ -55,7 +55,7 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
       </div>
 
       <div className="flex justify-center items-center gap-12">
-        <div className={`md:flex justify-center gap-3 items-center hidden ${scrolled ? 'text-[#000]' : 'text-white'}`}>
+        <div className={`md:flex justify-center gap-3 items-center hidden ${scrolled ? 'text-[#000]' : 'text-black'}`}>
           <a href="https://x.com/Selora_Fi" target="_blank">
             <FaXTwitter size={30} />
           </a>
