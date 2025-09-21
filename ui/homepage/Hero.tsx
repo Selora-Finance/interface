@@ -1,15 +1,25 @@
+'use client';
+
+import { useAtom } from 'jotai';
 import { Button } from '../../components/Button';
+import { themeAtom } from '@/store';
+import { useMemo } from 'react';
+import { Themes } from '@/constants';
 
 export default function Hero() {
+  const [theme] = useAtom(themeAtom);
+  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   return (
-    <section className="text-center py-20 relative overflow-hidden w-full">
-      <div className="absolute top-20 left-1/4 w-64 h-64 bg-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
-      <div className="absolute top-40 right-1/4 w-64 h-64 bg-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse"></div>
+    <section className="text-center py-20 md:py-44 relative overflow-hidden w-full">
+      <div className="absolute top-20 left-2 md:left-1/5 w-32 h-32 md:w-64 md:h-64 bg-orange-600 rounded-full filter blur opacity-30 animate-pulse"></div>
+      <div className="absolute top-40 right-2 md:right-1/5 w-16 h-16 md:w-32 md:h-32 bg-orange-600 rounded-full filter blur opacity-30 animate-pulse"></div>
 
-      <h1 className="text-3xl md:text-5xl font-extrabold max-w-3xl mx-auto">
+      <h1
+        className={`text-3xl md:text-5xl font-extrabold max-w-3xl mx-auto ${isDarkMode ? 'text-white' : 'text-black'}`}
+      >
         The Central Trading & Liquidity Marketplace on Fluent
       </h1>
-      <p className="mt-4 text-lg text-[#fff] max-w-2xl mx-auto">
+      <p className={`mt-4 text-lg max-w-2xl mx-auto ${isDarkMode ? 'text-white' : 'text-black'}`}>
         Selora is a ve(3,3) AMM powering sustainable liquidity, governance, and incentives on Fluent network.
       </p>
 

@@ -1,7 +1,10 @@
 'use client';
 
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Plus, Minus } from 'lucide-react';
+import { Themes } from '@/constants';
+import { themeAtom } from '@/store';
+import { useAtom } from 'jotai';
 
 const faqs = [
   { q: 'What is Selora?', a: 'Selora is a decentralized trading and liquidity marketplace.' },
@@ -11,22 +14,33 @@ const faqs = [
 
 export default function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [theme] = useAtom(themeAtom);
+  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
 
   return (
     <section className="w-full mx-auto px-4 py-12">
-      <h2 className="text-2xl font-bold text-center mb-6">FAQ</h2>
+      <h2 className={`text-2xl font-bold text-center mb-6 ${isDarkMode ? 'text-[#fff]' : 'text-[#000]'}`}>FAQ</h2>
       <div className="space-y-4 w-full">
         {faqs.map((faq, idx) => (
-          <div key={faq.q} className="rounded-lg p-4 cursor-pointer w-full bg-[#211b1b]">
-            <button
-              className="w-full text-left font-medium flex justify-between items-center cursor-pointer"
-              onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+          <button
+            key={faq.q}
+            className={`rounded-lg px-4 py-7 cursor-pointer w-full ${
+              isDarkMode ? 'bg-[#211b1b]' : 'bg-[#fff]'
+            } text-left`}
+            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+          >
+            <div
+              className={`w-full text-left font-medium flex justify-between items-center cursor-pointer ${
+                isDarkMode ? 'text-[#fff]' : 'text-[#000]'
+              }`}
             >
               {faq.q}
-              <span>{openIndex === idx ? <Minus /> : <Plus />}</span>
-            </button>
+              <span className={`${isDarkMode ? 'text-[#fff]' : 'text-[#000]'}`}>
+                {openIndex === idx ? <Minus /> : <Plus />}
+              </span>
+            </div>
             {openIndex === idx && <p className="mt-2 text-gray-600">{faq.a}</p>}
-          </div>
+          </button>
         ))}
       </div>
     </section>

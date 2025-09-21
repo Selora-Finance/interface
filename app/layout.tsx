@@ -1,14 +1,7 @@
 import type { Metadata } from 'next';
-import { Tomorrow } from 'next/font/google';
 import './globals.css';
-import Footer from '@/ui/Footer';
-import Navbar from '@/ui/Navbar';
-
-const tomorrow = Tomorrow({
-  variable: '--font-tomorrow',
-  subsets: ['latin'],
-  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
-});
+import { RootProvider } from './__providers__';
+import { AppView } from './__render__';
 
 export const metadata: Metadata = {
   title: 'Create Next App',
@@ -22,13 +15,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${tomorrow.className} antialiased flex w-dvw min-h-dvh flex-col justify-start items-center overflow-x-clip`}
-      >
-        <Navbar defaultBg="bg-transparent" mobileMenuBg="bg-[#211b1b]" />
-        <main className="flex-1">{children}</main>
-        <Footer />
-      </body>
+      <RootProvider>
+        <AppView>{children}</AppView>
+      </RootProvider>
     </html>
   );
 }
