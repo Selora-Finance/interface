@@ -1,17 +1,27 @@
-import { LucideIcon } from "lucide-react";
+import { cva } from 'class-variance-authority';
+import { cn } from '@/lib/utils';
+import React, { ReactNode } from 'react';
 
-interface CardProps {
-  title: string;
-  text: string;
-  Icon?: LucideIcon;
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
+  children: ReactNode;
+  variant?: 'primary' | 'secondary' | 'neutral';
 }
 
-export default function Card({ title, text, Icon }: CardProps) {
+const cardVariants = cva('rounded-lg transition', {
+  variants: {
+    variant: {
+      primary: 'bg-white text-[#000]',
+      secondary: 'bg-orange-600 text-white border border-orange-600',
+      neutral: 'bg-[#211b1b] text-[#fff]',
+    },
+  },
+  defaultVariants: { variant: 'primary' },
+});
+
+export const Card: React.FC<CardProps> = ({ children, variant = 'primary', className, ...props }) => {
   return (
-    <div className="bg-orange-600 text-white p-6 rounded-lg shadow hover:scale-105 transition">
-      {Icon && <Icon className="w-8 h-8 mb-3" />}
-      <h3 className="text-xl font-semibold">{title}</h3>
-      <p className="mt-2 text-sm">{text}</p>
+    <div className={cn(cardVariants({ variant }), className)} {...props}>
+      {children}
     </div>
   );
-}
+};

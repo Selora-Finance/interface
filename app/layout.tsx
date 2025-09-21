@@ -1,15 +1,13 @@
 import type { Metadata } from 'next';
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Tomorrow } from 'next/font/google';
 import './globals.css';
+import Footer from '@/ui/Footer';
+import Navbar from '@/ui/Navbar';
 
-const geistSans = Geist({
-  variable: '--font-geist-sans',
+const tomorrow = Tomorrow({
+  variable: '--font-tomorrow',
   subsets: ['latin'],
-});
-
-const geistMono = Geist_Mono({
-  variable: '--font-geist-mono',
-  subsets: ['latin'],
+  weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
 });
 
 export const metadata: Metadata = {
@@ -24,7 +22,13 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>{children}</body>
+      <body
+        className={`${tomorrow.className} antialiased flex w-dvw min-h-dvh flex-col justify-start items-center overflow-x-clip`}
+      >
+        <Navbar defaultBg="bg-transparent" mobileMenuBg="bg-[#211b1b]" />
+        <main className="flex-1">{children}</main>
+        <Footer />
+      </body>
     </html>
   );
 }
