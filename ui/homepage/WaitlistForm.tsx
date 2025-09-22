@@ -1,6 +1,9 @@
 'use client';
 
-import { useCallback, useState } from 'react';
+import { Themes } from '@/constants';
+import { themeAtom } from '@/store';
+import { useAtom } from 'jotai';
+import { useCallback, useMemo, useState } from 'react';
 
 interface WaitlistFormProps {
   onSubmit?: (email: string) => void;
@@ -8,6 +11,8 @@ interface WaitlistFormProps {
 
 export default function WaitlistForm({ onSubmit }: WaitlistFormProps) {
   const [email, setEmail] = useState('');
+  const [theme] = useAtom(themeAtom);
+  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
 
   const handleSubmit = useCallback(
     (e: React.FormEvent) => {
@@ -29,7 +34,9 @@ export default function WaitlistForm({ onSubmit }: WaitlistFormProps) {
         value={email}
         onChange={e => setEmail(e.target.value)}
         required
-        className="w-full px-6 py-7 bg-transparent border border-[#FF4500] rounded-md text-white focus:outline-none focus:ring-2 focus:ring-[#FF4500]"
+        className={`w-full px-6 py-7 bg-transparent border border-[#FF4500] rounded-md ${
+          isDarkMode ? 'text-white' : 'text-black'
+        } focus:outline-none focus:ring-2 focus:ring-[#FF4500]`}
       />
 
       {/* Button */}

@@ -3,7 +3,7 @@
 import { useAtom } from 'jotai';
 import { Button } from '../../components/Button';
 import { themeAtom } from '@/store';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Themes } from '@/constants';
 import { Modal } from '@/components';
 import WaitlistForm from './WaitlistForm';
@@ -12,6 +12,11 @@ export default function Hero() {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+
+  const openDocs = useCallback(() => {
+    if (typeof window !== 'undefined') window.open('https://selora.gitbook.io/selora', '_blank');
+  }, []);
+
   return (
     <>
       <section className="text-center py-20 md:py-44 relative overflow-hidden w-full">
@@ -30,13 +35,19 @@ export default function Hero() {
         </p>
 
         <div className="mt-6 flex justify-center gap-4 w-full flex-col md:flex-row">
-          <Button onClick={() => setShowWaitlistModal(true)} className="w-full md:w-1/7 py-3">
+          <Button onClick={() => setShowWaitlistModal(true)} className="w-full md:w-1/7 py-3 cursor-pointer">
             Join Waitlist
           </Button>
-          <Button className="w-full md:w-1/7 py-3">Read Docs</Button>
+          <Button onClick={openDocs} className="w-full md:w-1/7 py-3 cursor-pointer">
+            Read Docs
+          </Button>
         </div>
       </section>
-      <Modal isOpen={showWaitlistModal} onClose={() => setShowWaitlistModal(false)}>
+      <Modal
+        isOpen={showWaitlistModal}
+        variant={isDarkMode ? 'secondary' : 'primary'}
+        onClose={() => setShowWaitlistModal(false)}
+      >
         <WaitlistForm />
       </Modal>
     </>

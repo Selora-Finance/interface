@@ -1,25 +1,44 @@
 'use client';
 
+import { cva } from 'class-variance-authority';
 import { ReactNode } from 'react';
 
 interface ModalProps {
   isOpen: boolean;
   onClose: () => void;
   children: ReactNode;
+  variant?: 'primary' | 'secondary';
 }
 
-export default function Modal({ isOpen, onClose, children }: ModalProps) {
+const overlayVariants = cva('absolute inset-0 backdrop-blur-sm transition-opacity duration-300', {
+  variants: {
+    variant: {
+      primary: 'bg-white/60 text-[#000]',
+      secondary: 'bg-black/60 text-[#fff]',
+    },
+  },
+  defaultVariants: { variant: 'primary' },
+});
+
+const modalContentVariants = cva('relative flex flex-col shadow-2xl transition-transform duration-300', {
+  variants: {
+    variant: {
+      primary: 'bg-white text-[#000]',
+      secondary: 'bg-[#211b1b] text-white',
+    },
+  },
+  defaultVariants: { variant: 'primary' },
+});
+
+export default function Modal({ isOpen, onClose, children, variant }: ModalProps) {
   return isOpen ? (
     <div className="fixed inset-0 flex items-center justify-center z-50 transition-opacity duration-300 cursor-pointer">
       {/* Overlay */}
-      <div
-        className="absolute inset-0 bg-black/60 backdrop-blur-sm transition-opacity duration-300"
-        onClick={onClose}
-      />
+      <div className={overlayVariants({ variant })} onClick={onClose} />
 
       {/* Modal Content */}
       <div
-        className="relative bg-[#211b1b] text-white flex flex-col shadow-2xl transition-transform duration-300"
+        className={modalContentVariants({ variant })}
         style={{
           width: '90%',
           maxWidth: '499px',
