@@ -1,7 +1,7 @@
 @import 'tailwindcss';
 
 :root {
-  --background: #ffffff;
+  --background: #f5eee8;
   --foreground: #171717;
 }
 
@@ -22,4 +22,59 @@
 body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Floating Animations for Background Blobs */
+@keyframes float1 {
+  0%,
+  100% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(10px, 20px);
+  }
+}
+
+@keyframes float2 {
+  0%,
+  100% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(-15px, 15px);
+  }
+}
+
+@keyframes float3 {
+  0%,
+  100% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(20px, -10px);
+  }
+}
+
+@keyframes float4 {
+  0%,
+  100% {
+    transform: translate(0px, 0px);
+  }
+  50% {
+    transform: translate(-10px, -20px);
+  }
+}
+
+/* Animation classes */
+.animate-float1 {
+  animation: float1 12s ease-in-out infinite;
+}
+.animate-float2 {
+  animation: float2 14s ease-in-out infinite;
+}
+.animate-float3 {
+  animation: float3 16s ease-in-out infinite;
+}
+.animate-float4 {
+  animation: float4 18s ease-in-out infinite;
 }
