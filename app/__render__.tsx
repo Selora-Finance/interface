@@ -25,6 +25,19 @@ export const AppView: React.FC<{ children: React.ReactNode }> = ({ children }) =
         isDarkMode ? 'bg-[#111111]' : 'bg-[#f5eee8]'
       }`}
     >
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        {/* Blob 1 */}
+        <div className="absolute top-10 left-10 w-72 h-72 bg-orange-400 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse animate-float1 sm:w-64 sm:h-64 md:w-80 md:h-80"></div>
+
+        {/* Blob 2 */}
+        <div className="absolute top-1/3 right-10 w-72 h-72 bg-orange-600 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-pulse animate-float2 sm:w-64 sm:h-64 md:w-80 md:h-80"></div>
+
+        {/* Blob 3 */}
+        <div className="absolute bottom-20 left-1/4 w-64 h-64 bg-yellow-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animate-float3 sm:w-52 sm:h-52 md:w-64 md:h-64"></div>
+
+        {/* Blob 4 */}
+        <div className="absolute bottom-10 right-1/3 w-64 h-64 bg-red-400 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-pulse animate-float4 sm:w-52 sm:h-52 md:w-64 md:h-64"></div>
+      </div>
       <Navbar defaultBg="bg-transparent" mobileMenuBg={`${isDarkMode ? 'bg-[#211b1b]' : 'bg-[#fff]'}`} />
       <main className="flex-1">{children}</main>
       <Footer />

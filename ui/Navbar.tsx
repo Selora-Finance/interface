@@ -38,14 +38,18 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
     <nav
       className={`px-6 py-4 flex justify-between items-center fixed transition-all duration-500 w-dvw z-20 ${
         scrolled ? scrolledBg + ' shadow-lg' : defaultBg
-      } ${scrolled ? 'text-gray-900' : 'text-white'}`}
+      } ${scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'}`}
     >
       {/* Logo */}
       <div className="flex justify-center items-center gap-4">
         <Link href="/">
           <Logo className="w-10 h-10 rounded-full" />
         </Link>
-        <span className={`${scrolled ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}>Selora</span>
+        <span
+          className={`${scrolled || !isDarkMode ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}
+        >
+          Selora
+        </span>
       </div>
 
       {/* Desktop Nav */}
@@ -59,7 +63,11 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
       </div>
 
       <div className="flex justify-center items-center gap-12">
-        <div className={`md:flex justify-center gap-3 items-center hidden ${scrolled ? 'text-[#000]' : 'text-white'}`}>
+        <div
+          className={`md:flex justify-center gap-3 items-center hidden ${
+            scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'
+          }`}
+        >
           <a href="https://x.com/Selora_Fi" target="_blank">
             <FaXTwitter size={30} />
           </a>
@@ -82,19 +90,19 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
         </button>
       </div>
 
-         {/* Mobile Dropdown Menu */}
-<div
-  className={`absolute z-[9999] top-full left-0 w-full p-6 flex flex-col gap-4 md:hidden text-white overflow-hidden transition-all duration-500 ease-in-out 
-    ${mobileBg} 
-    ${open ? 'max-h-96 opacity-100 translate-y-0' : 'max-h-0 opacity-0 -translate-y-4'}`}
->
-  <Link href="#">Trade</Link>
-  <Link href="#">Liquidity</Link>
-  <Link href="#">Dashboard</Link>
-  <Link href="#">Vote</Link>
-  <Link href="#">Lock</Link>
-  <Link href="#">Incentivize</Link>
-</div>
+      {/* Mobile Dropdown Menu */}
+      {open && dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE && (
+        <div
+          className={`absolute z-[9999] top-full left-0 w-full p-6 flex flex-col gap-4 md:hidden transition-all duration-1000 ${mobileBg}`}
+        >
+          <Link href="#">Trade</Link>
+          <Link href="#">Liquidity</Link>
+          <Link href="#">Dashboard</Link>
+          <Link href="#">Vote</Link>
+          <Link href="#">Lock</Link>
+          <Link href="#">Incentivize</Link>
+        </div>
+      )}
     </nav>
   );
 }

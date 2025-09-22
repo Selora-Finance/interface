@@ -19,24 +19,30 @@ export default function FAQ() {
 
   return (
     <section className="w-full mx-auto px-4 py-12">
-      <h2 className="text-2xl font-bold text-center mb-8">FAQ</h2>
+      <h2 className={`text-2xl font-bold text-center mb-6 ${isDarkMode ? 'text-[#fff]' : 'text-[#000]'}`}>FAQ</h2>
       <div className="space-y-4 w-full">
         {faqs.map((faq, idx) => (
-          <div key={faq.q} className="rounded-lg p-4 cursor-pointer w-full bg-[#211b1b]">
-            <button
-              className="w-full text-left font-medium flex justify-between items-center cursor-pointer"
-              onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+          <button
+            key={faq.q}
+            className={`rounded-lg px-4 py-7 cursor-pointer w-full ${
+              isDarkMode ? 'bg-[#211b1b]' : 'bg-[#fff]'
+            } text-left`}
+            onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+          >
+            <div
+              className={`w-full text-left font-medium flex justify-between items-center cursor-pointer ${
+                isDarkMode ? 'text-[#fff]' : 'text-[#000]'
+              }`}
             >
               {faq.q}
-              <span>{openIndex === idx ? <Minus /> : <Plus />}</span>
-            </button>
+              <span className={`${isDarkMode ? 'text-[#fff]' : 'text-[#000]'}`}>
+                {openIndex === idx ? <Minus /> : <Plus />}
+              </span>
+            </div>
             {openIndex === idx && <p className="mt-2 text-gray-600">{faq.a}</p>}
-          </div>
+          </button>
         ))}
       </div>
     </section>
   );
 }
-
-
-//bg-[#211b1b]

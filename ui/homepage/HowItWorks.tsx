@@ -27,7 +27,7 @@ export default function HowItWorks() {
           <Card
             key={item.title}
             variant="secondary"
-            className="flex flex-col justify-center items-center gap-3 py-10 px-5 w-full md:w-1/4 self-stretch"
+            className="flex flex-col justify-center items-center gap-3 py-7 px-5 w-full md:w-1/4 self-stretch"
           >
             <item.icon size={70} />
             <h3 className="text-xl md:text-2xl font-medium">{item.title}</h3>
