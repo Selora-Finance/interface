@@ -54,12 +54,12 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
 
       {/* Desktop Nav */}
       <div className="hidden md:flex gap-6 justify-center items-center">
-        <Link href="#">Trade</Link>
-        <Link href="#">Liquidity</Link>
-        <Link href="#">Dashboard</Link>
-        <Link href="#">Vote</Link>
-        <Link href="#">Lock</Link>
-        <Link href="#">Incentivize</Link>
+        <Link href="/swap">Trade</Link>
+        <Link href="/liquidity">Liquidity</Link>
+        <Link href="/dashboard">Dashboard</Link>
+        <Link href="/vote">Vote</Link>
+        <Link href="/lock">Lock</Link>
+        <Link href="/incentivize">Incentivize</Link>
       </div>
 
       <div className="flex justify-center items-center gap-12">
@@ -95,12 +95,12 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
         <div
           className={`absolute z-[9999] top-full left-0 w-full p-6 flex flex-col gap-4 md:hidden transition-all duration-1000 ${mobileBg}`}
         >
-          <Link href="#">Trade</Link>
-          <Link href="#">Liquidity</Link>
-          <Link href="#">Dashboard</Link>
-          <Link href="#">Vote</Link>
-          <Link href="#">Lock</Link>
-          <Link href="#">Incentivize</Link>
+          <Link href="/swap">Trade</Link>
+          <Link href="/liquidity">Liquidity</Link>
+          <Link href="/dashboard">Dashboard</Link>
+          <Link href="/vote">Vote</Link>
+          <Link href="/lock">Lock</Link>
+          <Link href="/incentivize">Incentivize</Link>
         </div>
       )}
     </nav>

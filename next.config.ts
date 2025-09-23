@@ -1,13 +1,10 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  experimental: {
-    globalNotFound: true,
-  },
   webpack(config) {
     // Finds the existing rule for handling image imports
     const fileLoaderRule = config.module.rules.find(
-      (rule) => rule.test && rule.test.test('.svg')
+      (rule: { test: { test: (arg0: string) => any } }) => rule.test && rule.test.test('.svg'),
     );
 
     if (fileLoaderRule) {
