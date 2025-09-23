@@ -1,8 +1,7 @@
 import FAQ from '@/ui/homepage/FAQ';
 import Hero from '@/ui/homepage/Hero';
 import HowItWorks from '@/ui/homepage/HowItWorks';
-import Stats from '@/ui/homepage/Stats'; 
-
+import Stats from '@/ui/homepage/Stats';
 
 export default function Home() {
   return (
@@ -11,7 +10,6 @@ export default function Home() {
       <Stats />
       <HowItWorks />
       <FAQ />
-     
     </div>
   );
 }
