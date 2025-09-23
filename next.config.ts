@@ -1,9 +1,14 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
+  experimental: {
+    globalNotFound: true,
+  },
   webpack(config) {
     // Finds the existing rule for handling image imports
-    const fileLoaderRule = config.module.rules.find(rule => rule.test && rule.test.test('.svg'));
+    const fileLoaderRule = config.module.rules.find(
+      (rule) => rule.test && rule.test.test('.svg')
+    );
 
     if (fileLoaderRule) {
       // Excludes SVG files from the default image loader
