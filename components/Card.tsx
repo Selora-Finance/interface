@@ -1,5 +1,5 @@
 import { cva } from 'class-variance-authority';
-import { cn } from '@/lib/utils';
+import { cn } from '@/lib/client/utils';
 import React, { ReactNode } from 'react';
 
 interface CardProps extends React.HTMLAttributes<HTMLDivElement> {
