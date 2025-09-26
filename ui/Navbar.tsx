@@ -4,6 +4,8 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { FaXTwitter, FaDiscord } from 'react-icons/fa6';
 import { useState, useEffect, useMemo } from 'react';
+import { useAccount, useDisconnect } from 'wagmi';
+import { useConnectModal } from '@rainbow-me/rainbowkit';
 import Logo from '@/components/Logo';
 import { useWindowDimensions } from '@/hooks/utils';
 import { MAX_SCREEN_SIZES, Themes } from '@/constants';
@@ -23,6 +25,11 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
 
+  // RainbowKit hooks
+  const { isConnected, address } = useAccount();
+  const { openConnectModal } = useConnectModal();
+  const { disconnect } = useDisconnect();
+
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -33,6 +40,20 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
     () => (mobileMenuBg ? mobileMenuBg : scrolled ? scrolledBg : defaultBg),
     [mobileMenuBg, scrolled, scrolledBg, defaultBg],
   );
+
+  // Format address for display
+  const formatAddress = (address: string) => {
+    return `${address.slice(0, 6)}...${address.slice(-4)}`;
+  };
+
+  // Handle wallet connection/disconnection
+  const handleWalletClick = () => {
+    if (isConnected) {
+      disconnect();
+    } else {
+      openConnectModal?.();
+    }
+  };
 
   return (
     <nav
@@ -75,12 +96,22 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
             <FaDiscord size={30} />
           </a>
         </div>
-        <button className="hidden md:block bg-orange-600 px-6 py-2 rounded-lg text-white">Connect</button>
+        <button 
+          onClick={handleWalletClick}
+          className="hidden md:block bg-orange-600 px-6 py-2 rounded-lg text-white hover:bg-orange-700 transition-colors"
+        >
+          {isConnected ? formatAddress(address!) : 'Connect'}
+        </button>
       </div>
 
       {/* Mobile Menu Button + Connect */}
       <div className="flex items-center gap-2 md:hidden ml-auto">
-        <button className="bg-orange-600 px-5 py-2 rounded-lg text-white">Connect</button>
+        <button 
+          onClick={handleWalletClick}
+          className="bg-orange-600 px-5 py-2 rounded-lg text-white hover:bg-orange-700 transition-colors"
+        >
+          {isConnected ? formatAddress(address!) : 'Connect'}
+        </button>
         <button
           onClick={() => setOpen(prev => !prev)}
           aria-label="Toggle Menu"

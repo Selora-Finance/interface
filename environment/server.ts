@@ -18,6 +18,10 @@ export const { GOOGLE_API_KEY, GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL,
   emptyStringAsUndefined: true,
   onValidationError: issues => {
     console.error(issues);
-    throw new Error('Invalid environment variables');
+    throw  Error(
+      process.env.NODE_ENV === 'production'
+        ? 'Invalid environment variables'
+        : 'Continuing with missing environment variables in development'
+    );
   },
 });

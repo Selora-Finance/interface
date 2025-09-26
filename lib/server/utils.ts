@@ -2,7 +2,7 @@
 
 import * as zod from 'zod';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { SPREADSHEET_ID, GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL } from '@/environment';
+import { SPREADSHEET_ID, GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL } from '@/environment/server';
 import { JWT } from 'google-auth-library';
 
 // Schemas
