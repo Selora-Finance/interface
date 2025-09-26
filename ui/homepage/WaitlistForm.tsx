@@ -1,5 +1,6 @@
 'use client';
 
+import { Button, Spinner } from '@/components';
 import { Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
@@ -7,9 +8,10 @@ import { useCallback, useMemo, useState } from 'react';
 
 interface WaitlistFormProps {
   onSubmit?: (email: string) => void;
+  isLoading?: boolean;
 }
 
-export default function WaitlistForm({ onSubmit }: WaitlistFormProps) {
+export default function WaitlistForm({ onSubmit, isLoading }: WaitlistFormProps) {
   const [email, setEmail] = useState('');
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
@@ -40,12 +42,13 @@ export default function WaitlistForm({ onSubmit }: WaitlistFormProps) {
       />
 
       {/* Button */}
-      <button
+      <Button
         type="submit"
-        className="w-full bg-orange-600 text-white font-medium py-7 rounded-md transition-all hover:bg-orange-500"
+        className="w-full text-white font-medium py-7 rounded-md transition-all hover:bg-orange-500 flex justify-center gap-3 cursor-pointer"
       >
         Join Waitlist
-      </button>
+        {isLoading && <Spinner size="sm" />}
+      </Button>
     </form>
   );
 }

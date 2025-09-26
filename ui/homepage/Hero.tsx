@@ -7,14 +7,39 @@ import { useCallback, useMemo, useState } from 'react';
 import { Themes } from '@/constants';
 import { Modal } from '@/components';
 import WaitlistForm from './WaitlistForm';
+import { useMutation } from '@tanstack/react-query';
+import { appendToSpreadsheet } from '@/lib/server/utils';
+import WaitlistSuccessModal from '../WaitlistSuccessModal';
+import WaitlistErrorModal from '../WaitlistErrorModal';
 
 export default function Hero() {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const [showWaitlistModal, setShowWaitlistModal] = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [showError, setShowError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const { mutate: mutateWaitlist, isPending: waitlistSubmissionLoading } = useMutation({
+    mutationFn: appendToSpreadsheet,
+  });
 
   const openDocs = useCallback(() => {
     if (typeof window !== 'undefined') window.open('https://selora.gitbook.io/selora', '_blank');
+  }, []);
+
+  const addToWaitlist = useCallback((email: string) => {
+    mutateWaitlist(
+      { email, date: new Date() },
+      {
+        onSuccess: () => {
+          setShowSuccess(true);
+        },
+        onError: error => {
+          setErrorMessage(error.message);
+          setShowError(true);
+        },
+      },
+    );
   }, []);
 
   return (
@@ -48,8 +73,22 @@ export default function Hero() {
         variant={isDarkMode ? 'secondary' : 'primary'}
         onClose={() => setShowWaitlistModal(false)}
       >
-        <WaitlistForm />
+        <WaitlistForm onSubmit={addToWaitlist} isLoading={waitlistSubmissionLoading} />
       </Modal>
+      <WaitlistSuccessModal
+        show={showSuccess}
+        onHide={() => {
+          setShowSuccess(false);
+        }}
+      />
+      <WaitlistErrorModal
+        show={showError}
+        message={errorMessage}
+        onHide={() => {
+          setShowError(false);
+          setErrorMessage('');
+        }}
+      />
     </>
   );
 }

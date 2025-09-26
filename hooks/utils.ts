@@ -1,3 +1,4 @@
+import { DEFAULT_PROCESS_DURATION } from '@/constants';
 import { useEffect, useState } from 'react';
 
 interface WindowDimensions {
@@ -29,4 +30,11 @@ export function useWindowDimensions() {
   }, []);
 
   return windowDimensions;
+}
+
+export function useSetTimeout(cb: () => void, delay = DEFAULT_PROCESS_DURATION) {
+  return useEffect(() => {
+    const timeout = setTimeout(cb, delay);
+    return () => clearTimeout(timeout);
+  }, [cb, delay]);
 }

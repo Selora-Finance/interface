@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next';
 
 const nextConfig: NextConfig = {
-  webpack(config) {
+  webpack(config, { isServer }) {
     // Finds the existing rule for handling image imports
     const fileLoaderRule = config.module.rules.find(
       (rule: { test: { test: (arg0: string) => any } }) => rule.test && rule.test.test('.svg'),
@@ -18,6 +18,15 @@ const nextConfig: NextConfig = {
       use: ['@svgr/webpack'],
       issuer: /\.[jt]sx?$/,
     });
+
+    if (!isServer)
+      config.resolve.fallback = {
+        ...config.resolve.fallback,
+        child_process: false,
+        fs: false,
+        net: false,
+        tls: false,
+      };
 
     return config;
   },

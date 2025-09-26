@@ -8,3 +8,5 @@ export enum Themes {
   LIGHT = 'light',
   DARK = 'dark',
 }
+
+export const DEFAULT_PROCESS_DURATION = 5000;
