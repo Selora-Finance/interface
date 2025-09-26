@@ -11,6 +11,7 @@ import { useWindowDimensions } from '@/hooks/utils';
 import { MAX_SCREEN_SIZES, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
+import { Button } from '@/components';
 
 interface NavbarProps {
   defaultBg?: string; // Navbar background at top
@@ -96,22 +97,22 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
             <FaDiscord size={30} />
           </a>
         </div>
-        <button 
+        <Button
           onClick={handleWalletClick}
-          className="hidden md:block bg-orange-600 px-6 py-2 rounded-lg text-white hover:bg-orange-700 transition-colors"
+          className="hidden md:block px-6 py-2 rounded-lg text-white transition-colors cursor-pointer"
         >
           {isConnected ? formatAddress(address!) : 'Connect'}
-        </button>
+        </Button>
       </div>
 
       {/* Mobile Menu Button + Connect */}
       <div className="flex items-center gap-2 md:hidden ml-auto">
-        <button 
+        <Button
           onClick={handleWalletClick}
-          className="bg-orange-600 px-5 py-2 rounded-lg text-white hover:bg-orange-700 transition-colors"
+          className="hidden md:block px-6 py-2 rounded-lg text-white transition-colors cursor-pointer"
         >
           {isConnected ? formatAddress(address!) : 'Connect'}
-        </button>
+        </Button>
         <button
           onClick={() => setOpen(prev => !prev)}
           aria-label="Toggle Menu"

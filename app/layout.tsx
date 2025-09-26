@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import './globals.css';
-import { RootProvider } from './__providers__';
+import '@rainbow-me/rainbowkit/styles.css';
 import { AppView } from './__render__';
 
 export const metadata: Metadata = {
@@ -16,9 +16,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <RootProvider>
-        <AppView>{children}</AppView>
-      </RootProvider>
+      <AppView>{children}</AppView>
     </html>
   );
 }
