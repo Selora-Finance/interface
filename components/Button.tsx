@@ -11,8 +11,8 @@ const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: 'bg-orange-600 text-white hover:bg-orange-700 focus:ring-orange-500',
-        secondary: 'bg-white text-orange-600 border border-orange-600 hover:bg-orange-50 focus:ring-orange-500',
+        primary: 'bg-orange-600 text-white hover:bg-orange-700 active:ring-orange-500',
+        secondary: 'bg-white text-orange-600 border border-orange-600 hover:bg-orange-50 active:ring-orange-500',
       },
     },
     defaultVariants: { variant: 'primary' },

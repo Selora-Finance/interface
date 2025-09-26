@@ -7,6 +7,7 @@ import { useAtom } from 'jotai';
 import { themeAtom } from '@/store';
 import { useMemo } from 'react';
 import { Themes } from '@/constants';
+import { RootProvider } from './__providers__';
 
 const tomorrow = Tomorrow({
   variable: '--font-tomorrow',
@@ -14,14 +15,13 @@ const tomorrow = Tomorrow({
   weight: ['100', '200', '300', '400', '500', '600', '700', '800', '900'],
 });
 
-export const AppView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+const AppChildren: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
+
   return (
-    <body
-      className={`${
-        tomorrow.className
-      } antialiased flex w-dvw min-h-dvh flex-col justify-start items-center overflow-x-clip transition-all duration-500 ${
+    <div
+      className={`flex w-dvw min-h-dvh flex-col justify-start items-center overflow-x-clip ${
         isDarkMode ? 'bg-[#111111]' : 'bg-[#f5eee8]'
       }`}
     >
@@ -41,6 +41,16 @@ export const AppView: React.FC<{ children: React.ReactNode }> = ({ children }) =
       <Navbar defaultBg="bg-transparent" mobileMenuBg={`${isDarkMode ? 'bg-[#211b1b]' : 'bg-[#fff]'}`} />
       <main className="flex-1">{children}</main>
       <Footer />
+    </div>
+  );
+};
+
+export const AppView: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  return (
+    <body className={`${tomorrow.className} antialiased w-dvw min-h-dvh overflow-x-clip transition-all duration-500`}>
+      <RootProvider>
+        <AppChildren>{children}</AppChildren>
+      </RootProvider>
     </body>
   );
 };

@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { createConfig, http } from "wagmi";
-import { Chain } from "wagmi/chains";
+import { createConfig, http } from 'wagmi';
+import { Chain } from 'wagmi/chains';
 import {
   metaMaskWallet,
   walletConnectWallet,
@@ -18,30 +18,30 @@ import {
   okxWallet,
   bitgetWallet,
   argentWallet,
-} from "@rainbow-me/rainbowkit/wallets";
-import { connectorsForWallets } from "@rainbow-me/rainbowkit";
-import { NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID } from "@/environment/client";
+} from '@rainbow-me/rainbowkit/wallets';
+import { connectorsForWallets } from '@rainbow-me/rainbowkit';
+import { NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID } from '@/environment/client';
 
 const fluentTestnet: Chain = {
   id: 20994,
-  name: "Fluent Testnet",
+  name: 'Fluent Testnet',
   nativeCurrency: {
-    name: "Ether",
-    symbol: "ETH",
+    name: 'Ether',
+    symbol: 'ETH',
     decimals: 18,
   },
   rpcUrls: {
     default: {
-      http: ["https://rpc.testnet.fluent.xyz/"],
+      http: ['https://rpc.testnet.fluent.xyz/'],
     },
     public: {
-      http: ["https://rpc.testnet.fluent.xyz/"],
+      http: ['https://rpc.testnet.fluent.xyz/'],
     },
   },
   blockExplorers: {
     default: {
-      name: "Fluentscan",
-      url: "https://testnet.fluentscan.xyz/",
+      name: 'Fluentscan',
+      url: 'https://testnet.fluentscan.xyz/',
     },
   },
   testnet: true,
@@ -51,50 +51,30 @@ const fluentTestnet: Chain = {
 const connectors = connectorsForWallets(
   [
     {
-      groupName: "Popular",
-      wallets: [
-        metaMaskWallet,
-        walletConnectWallet,
-        coinbaseWallet,
-        rainbowWallet,
-        trustWallet,
-      ],
+      groupName: 'Popular',
+      wallets: [metaMaskWallet, walletConnectWallet, coinbaseWallet, rainbowWallet, trustWallet],
     },
     {
-      groupName: "Hardware",
-      wallets: [
-        ledgerWallet,
-      ],
+      groupName: 'Hardware',
+      wallets: [ledgerWallet],
     },
     {
-      groupName: "Browser & Mobile",
-      wallets: [
-        phantomWallet,
-        braveWallet,
-        zerionWallet,
-        rabbyWallet,
-        okxWallet,
-        bitgetWallet,
-      ],
+      groupName: 'Browser & Mobile',
+      wallets: [phantomWallet, braveWallet, zerionWallet, rabbyWallet, okxWallet, bitgetWallet],
     },
     {
-      groupName: "Smart Wallets",
-      wallets: [
-        safeWallet,
-        argentWallet,
-      ],
+      groupName: 'Smart Wallets',
+      wallets: [safeWallet, argentWallet],
     },
     {
-      groupName: "Other",
-      wallets: [
-        injectedWallet,
-      ],
+      groupName: 'Other',
+      wallets: [injectedWallet],
     },
   ],
   {
-    appName: "Selora Finance",
+    appName: 'Selora Finance',
     projectId: NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
-  }
+  },
 );
 
 const config = createConfig({
