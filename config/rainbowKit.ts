@@ -20,6 +20,7 @@ import {
   argentWallet,
 } from "@rainbow-me/rainbowkit/wallets";
 import { connectorsForWallets } from "@rainbow-me/rainbowkit";
+import { NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID } from "@/environment/client";
 
 const fluentTestnet: Chain = {
   id: 20994,
@@ -92,7 +93,7 @@ const connectors = connectorsForWallets(
   ],
   {
     appName: "Selora Finance",
-    projectId: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID!,
+    projectId: NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   }
 );
 

@@ -6,7 +6,7 @@ import { RainbowKitProvider, lightTheme } from "@rainbow-me/rainbowkit";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Provider as JotaiProvider } from "jotai";
 
-import config from "./rainbowKitConfig";
+import config from "../config/rainbowKit";
 import { store } from "@/store";
 
 import "@rainbow-me/rainbowkit/styles.css";
