@@ -23,7 +23,6 @@ export default function TokenDropdown({ tokens, value, onChange, className = "" 
 
   const selected = tokens.find((t) => t.symbol === value) ?? tokens[0];
 
-
   useEffect(() => {
     function onDoc(e: MouseEvent) {
       if (!ref.current) return;
@@ -56,24 +55,24 @@ export default function TokenDropdown({ tokens, value, onChange, className = "" 
     return () => document.removeEventListener("keydown", onKey);
   }, [open, highlight, tokens, onChange]);
 
-  
   useEffect(() => {
     if (open) setHighlight(tokens.findIndex((t) => t.symbol === value));
   }, [open, value, tokens]);
 
   return (
     <div ref={ref} className={`relative ${className}`}>
+      {/* Selected Token Button */}
       <button
         type="button"
         aria-expanded={open}
         onClick={() => setOpen((s) => !s)}
-        className="w-full flex items-center gap-3 bg-[#333333] rounded px-3 py-2 text-left hover:bg-neutral-600 transition"
+        className="w-full flex items-center gap-3 bg-[#333333] rounded px-3 py-2 text-left hover:bg-neutral-600 transition cursor-pointer"
       >
         <Image
           src={selected.logo}
           alt={selected.symbol}
-          width={36}
-          height={36}
+          width={25} 
+          height={25} 
           className="rounded-full flex-shrink-0"
         />
         <div className="flex-1">
@@ -82,27 +81,20 @@ export default function TokenDropdown({ tokens, value, onChange, className = "" 
         </div>
 
         <svg
-          className={`w-3 h-3 transform transition-transform ${
-            open ? "rotate-180" : ""
-          } text-gray-300`}
+          className={`w-3 h-3 transform transition-transform ${open ? "rotate-180" : ""} text-gray-300`}
           viewBox="0 0 24 24"
           fill="none"
         >
-          <path
-            d="M6 9l6 6 6-6"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          />
+          <path d="M6 9l6 6 6-6" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
         </svg>
       </button>
 
+      {/* Dropdown List */}
       {open && (
         <ul
           role="listbox"
           aria-activedescendant={tokens[highlight]?.symbol}
-          className="absolute z-50 mt-2 w-full bg-[#333333] rounded shadow-lg py-1 max-h-[80vh] overflow-y-visible"
+          className="absolute z-50 mt-2 w-full bg-[#333333] rounded shadow-lg py-1 max-h-[80vh] overflow-y-auto"
         >
           {tokens.map((t, idx) => {
             const active = idx === highlight;
@@ -117,23 +109,20 @@ export default function TokenDropdown({ tokens, value, onChange, className = "" 
                   onChange(t.symbol);
                   setOpen(false);
                 }}
-                className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${
-                  active ? "bg-neutral-700" : "hover:bg-neutral-700"
-                }`}
+                className={`flex items-center gap-3 px-3 py-2 cursor-pointer ${active ? "bg-neutral-700" : "hover:bg-neutral-700"}`}
               >
                 <Image
                   src={t.logo}
                   alt={t.symbol}
-                  width={20}
-                  height={20}
-                  className="rounded-full"
+                  width={25} 
+                  height={25} 
+                  className="rounded-full flex-shrink-0"
                 />
                 <div className="flex-1">
                   <div className="text-white text-sm font-medium">{t.symbol}</div>
                   <div className="text-xs text-gray-400 -mt-0.5">{t.name}</div>
                 </div>
 
-                
                 {t.symbol === value && (
                   <svg
                     className="w-4 h-4 text-green-400"
@@ -143,11 +132,7 @@ export default function TokenDropdown({ tokens, value, onChange, className = "" 
                     viewBox="0 0 24 24"
                     xmlns="http://www.w3.org/2000/svg"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      d="M5 13l4 4L19 7"
-                    ></path>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7"></path>
                   </svg>
                 )}
               </li>

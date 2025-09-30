@@ -12,7 +12,7 @@ const TOKENS: Token[] = [
 ];
 
 export default function MainSwapView() {
-  const [sellToken, setSellToken] = useState("ETH");
+  const [sellToken, setSellToken] = useState("BNB");
   const [buyToken, setBuyToken] = useState("TEOS");
   const [sellAmount, setSellAmount] = useState("");
   const [buyAmount, setBuyAmount] = useState("");
@@ -80,7 +80,7 @@ export default function MainSwapView() {
   }
 
   return (
-    <div className="w-full max-w-md mx-auto bg-[#111111] rounded shadow-lg p-6 space-y-6">
+    <div className="w-full max-w-md mx-auto bg-[#1F1F1F] rounded shadow-lg p-6 space-y-6">
       <div className="flex items-center justify-between space-x-2">
         <h2 className="text-gray-300 text-lg font-medium">Swap</h2>
         <img src="./setting.png" alt="Swap Icon" className="w-4 h-4 cursor-pointer" />

@@ -1,6 +1,6 @@
 export default function SwapDetails() {
   return (
-    <div className="bg-[#111111] rounded px-6 py-8 text-sm text-white space-y-4 shadow">
+    <div className="bg-[#1F1F1F] rounded px-6 py-8 text-sm text-white space-y-4 shadow">
       <div className="flex justify-between">
         <span>Slippage Tolerance</span>
         <span className="text-white">0.5%</span>
