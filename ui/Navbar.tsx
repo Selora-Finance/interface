@@ -58,7 +58,7 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
 
   return (
     <nav
-      className={`px-6 py-4 flex justify-between items-center fixed transition-all duration-500 w-dvw z-20 ${
+      className={`px-6 py-4 md:py-8 flex justify-between items-center fixed transition-all duration-500 w-dvw z-20 ${
         scrolled ? scrolledBg + ' shadow-lg' : defaultBg
       } ${scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'}`}
     >

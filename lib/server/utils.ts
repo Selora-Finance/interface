@@ -2,8 +2,16 @@
 
 import * as zod from 'zod';
 import { GoogleSpreadsheet } from 'google-spreadsheet';
-import { SPREADSHEET_ID, GOOGLE_PRIVATE_KEY, GOOGLE_SERVICE_ACCOUNT_EMAIL } from '@/environment/server';
+import {
+  SPREADSHEET_ID,
+  GOOGLE_PRIVATE_KEY,
+  GOOGLE_SERVICE_ACCOUNT_EMAIL,
+  GITHUB_TOKEN,
+  ASSETS_REPO_SLUG,
+} from '@/environment/server';
 import { JWT } from 'google-auth-library';
+import { Octokit } from 'octokit';
+import { AssetResponseSchema, AssetResponseType } from '@/typings';
 
 // Schemas
 const SpreadsheetSubmissionSchema = zod.object({
@@ -59,4 +67,26 @@ export async function appendToSpreadsheet(data: zod.infer<typeof SpreadsheetSubm
   const sheet = loadSheet();
   const newRow = await sheet.addRow({ Email: email, Date: date.toLocaleString() });
   return newRow.toObject();
+}
+
+// Octokit
+const octokit = new Octokit({ auth: GITHUB_TOKEN });
+
+export async function getAssetList(chainId: number) {
+  // Split slug
+  const slug = ASSETS_REPO_SLUG.split('/');
+  const repo = slug[0]; // Repository name
+  const path = slug.slice(1).join('/').replace('{chainId}', String(chainId));
+  const { data } = await octokit.rest.repos.getContent({ repo, path, owner: 'Selora-Finance' });
+
+  if ('content' in data) {
+    const asBuffer = Buffer.from(data.content, 'base64');
+    const readable = JSON.parse(asBuffer.toString());
+    const { data: value, success, error } = AssetResponseSchema.safeParse(readable);
+
+    if (!success) return Promise.reject(error);
+    return value as AssetResponseType;
+  }
+
+  return [] as AssetResponseType;
 }

@@ -80,3 +80,14 @@ body {
 .animate-float4 {
   animation: float4 18s ease-in-out infinite;
 }
+
+@layer utilities {
+  .no-spinner {
+    -moz-appearance: textfield;
+  }
+  .no-spinner::-webkit-inner-spin-button,
+  .no-spinner::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+}
