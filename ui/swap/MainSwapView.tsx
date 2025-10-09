@@ -31,7 +31,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
   return (
-    <div className="flex flex-col justify-start items-center w-full md:w-1/4">
+    <div className="flex justify-center items-center w-full md:w-1/4">
       <Card
         variant={isDarkMode ? 'neutral' : 'primary'}
         className={`flex justify-center items-start w-full px-4 py-7 ${

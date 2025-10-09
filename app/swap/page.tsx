@@ -3,6 +3,7 @@
 import { useAssetList } from '@/context/assets';
 import AssetListModal from '@/ui/AssetListModal';
 import MainSwapView from '@/ui/swap/MainSwapView';
+import SwapDetails from '@/ui/swap/SwapDetails';
 import { useMemo, useState } from 'react';
 import { Address, getAddress, zeroAddress } from 'viem';
 
@@ -19,13 +20,14 @@ export default function Swap() {
   }, [assets, address0, address1]);
   return (
     <>
-      <div className="flex w-svw flex-1 justify-center items-center py-6 md:py-12 my-36 mx-auto relative px-3">
+      <div className="flex w-svw flex-1 justify-center items-center flex-col gap-4 py-6 md:py-12 my-36 mx-auto relative px-3">
         <MainSwapView
           asset0={asset0}
           asset1={asset1}
           onSelector0Click={() => setShowModal0(true)}
           onSelector1Click={() => setShowModal1(true)}
         />
+        <SwapDetails />
       </div>
       <AssetListModal
         isOpen={showModal0}
