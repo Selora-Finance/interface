@@ -16,3 +16,33 @@ export const AssetResponseSchema = zod.array(
 
 export type AssetType = zod.infer<typeof AssetResponseSchema.element>;
 export type AssetResponseType = zod.infer<typeof AssetResponseSchema>;
+
+export interface PoolData {
+  id: string;
+  token0: {
+    symbol: string;
+    logoURI: string;
+    amount?: string;
+  };
+  token1: {
+    symbol: string;
+    logoURI: string;
+    amount?: string;
+  };
+  tvl: string;
+  volume: string;
+  fees: string;
+  apr: string;
+  feeRate: string;
+  type: 'concentrated' | 'stable' | 'volatile';
+  hasPoints?: boolean;
+  pointsText?: string;
+  feeAmounts?: {
+    token0: string;
+    token1: string;
+  };
+  reserves?: {
+    token0: string;
+    token1: string;
+  };
+}
