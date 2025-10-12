@@ -26,6 +26,28 @@ export default function ConcentratedLiquidity() {
   const [amount0, setAmount0] = useState<string>('');
   const [amount1, setAmount1] = useState<string>('');
 
+  // Handle range type change and initialize custom prices
+  const handleRangeTypeChange = (type: 'preset' | 'custom') => {
+    setRangeType(type);
+    if (type === 'custom') {
+      // Initialize custom prices with current preset values
+      const presetRanges = {
+        passive: 0.5,
+        wide: 0.35,
+        narrow: 0.08,
+        aggressive: 0.01,
+        intense: 0.006,
+      };
+      const range = presetRanges[rangePreset] || 0.5;
+      setCustomMinPrice(currentPrice * (1 - range));
+      setCustomMaxPrice(currentPrice * (1 + range));
+    } else {
+      // Reset custom prices when switching to preset
+      setCustomMinPrice(null);
+      setCustomMaxPrice(null);
+    }
+  };
+
   // Assets list
   const assets = useAssetList();
   const [asset0, asset1] = useMemo(() => {
@@ -35,8 +57,21 @@ export default function ConcentratedLiquidity() {
   // Calculate current price (mock)
   const currentPrice = 0.00002454738;
 
-  // Calculate min/max price based on preset
+  // State for custom price range (can be adjusted by dragging)
+  const [customMinPrice, setCustomMinPrice] = useState<number | null>(null);
+  const [customMaxPrice, setCustomMaxPrice] = useState<number | null>(null);
+
+  // Calculate min/max price based on preset or custom values
   const { minPrice, maxPrice } = useMemo(() => {
+    // If custom values are set, use them
+    if (customMinPrice !== null && customMaxPrice !== null) {
+      return {
+        minPrice: customMinPrice,
+        maxPrice: customMaxPrice,
+      };
+    }
+
+    // Otherwise calculate from preset
     const presetRanges = {
       passive: 0.5, // +/- 50%
       wide: 0.35, // +/- 35%
@@ -50,7 +85,20 @@ export default function ConcentratedLiquidity() {
       minPrice: currentPrice * (1 - range),
       maxPrice: currentPrice * (1 + range),
     };
-  }, [rangePreset, currentPrice]);
+  }, [rangePreset, currentPrice, customMinPrice, customMaxPrice]);
+
+  // Handle range change from dragging
+  const handleRangeChange = (min: number, max: number) => {
+    setCustomMinPrice(min);
+    setCustomMaxPrice(max);
+  };
+
+  // Reset custom prices when preset changes
+  const handleRangePresetChange = (preset: RangePreset) => {
+    setRangePreset(preset);
+    setCustomMinPrice(null);
+    setCustomMaxPrice(null);
+  };
 
   const handleBackClick = () => {
     router.push('/liquidity/deposit');
@@ -104,14 +152,18 @@ export default function ConcentratedLiquidity() {
             feeTier={feeTier}
             onFeeTierChange={setFeeTier}
             rangeType={rangeType}
-            onRangeTypeChange={setRangeType}
+            onRangeTypeChange={handleRangeTypeChange}
             rangePreset={rangePreset}
-            onRangePresetChange={setRangePreset}
+            onRangePresetChange={handleRangePresetChange}
             amount0={amount0}
             amount1={amount1}
             onAmount0Change={setAmount0}
             onAmount1Change={setAmount1}
             currentPrice={currentPrice}
+            minPrice={minPrice}
+            maxPrice={maxPrice}
+            onMinPriceChange={setCustomMinPrice}
+            onMaxPriceChange={setCustomMaxPrice}
           />
           <CLRangeView
             asset0={asset0}
@@ -122,6 +174,7 @@ export default function ConcentratedLiquidity() {
             amount0={amount0}
             amount1={amount1}
             feeTier={feeTier}
+            onRangeChange={handleRangeChange}
           />
         </div>
       </div>

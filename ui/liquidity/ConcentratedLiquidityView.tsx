@@ -28,6 +28,10 @@ interface ConcentratedLiquidityViewProps {
   onAmount0Change?: (value: string) => void;
   onAmount1Change?: (value: string) => void;
   currentPrice?: number;
+  minPrice?: number;
+  maxPrice?: number;
+  onMinPriceChange?: (value: number) => void;
+  onMaxPriceChange?: (value: number) => void;
 }
 
 const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
@@ -46,6 +50,10 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
   onAmount0Change,
   onAmount1Change,
   currentPrice = 0.00002454738,
+  minPrice = 0,
+  maxPrice = 0,
+  onMinPriceChange,
+  onMaxPriceChange,
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
@@ -286,6 +294,139 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
               >
                 Full Range
               </button>
+            </div>
+          )}
+
+          {/* Custom Range Inputs */}
+          {rangeType === 'custom' && (
+            <div className="w-full flex flex-col gap-4">
+              {/* Labels */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                  Min {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                </span>
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 md:block hidden`}>
+                  Max {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                </span>
+              </div>
+
+              {/* Inputs Row */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {/* Min Price Input Container */}
+                <div
+                  className={`flex items-center rounded-lg border ${
+                    isDarkMode ? 'bg-[#211b1b] border-[#333333]' : 'bg-white border-[#d9d9d9]'
+                  }`}
+                >
+                  <button
+                    onClick={() => {
+                      const decrement = minPrice * 0.01; // 1% decrease
+                      onMinPriceChange?.(Math.max(0, minPrice - decrement));
+                    }}
+                    className={`${isMobile ? 'p-2' : 'p-3'} transition-all flex-shrink-0 ${
+                      isDarkMode ? 'hover:bg-[#333333]' : 'hover:bg-[#f5f5f5]'
+                    }`}
+                  >
+                    <svg
+                      width={isMobile ? '14' : '16'}
+                      height={isMobile ? '14' : '16'}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className={isDarkMode ? 'text-white' : 'text-black'}
+                    >
+                      <path d="M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                  <input
+                    type="number"
+                    value={minPrice.toFixed(10)}
+                    onChange={e => onMinPriceChange?.(parseFloat(e.target.value) || 0)}
+                    className={`flex-1 min-w-0 bg-transparent text-center outline-none px-2 py-3 ${
+                      isMobile ? 'text-xs' : 'text-base'
+                    } ${isDarkMode ? 'text-white' : 'text-black'}`}
+                    step="0.0000000001"
+                  />
+                  <button
+                    onClick={() => {
+                      const increment = minPrice * 0.01 || 0.0000000001; // 1% increase or minimum
+                      onMinPriceChange?.(minPrice + increment);
+                    }}
+                    className={`${isMobile ? 'p-2' : 'p-3'} transition-all flex-shrink-0 ${
+                      isDarkMode ? 'hover:bg-[#333333]' : 'hover:bg-[#f5f5f5]'
+                    }`}
+                  >
+                    <svg
+                      width={isMobile ? '14' : '16'}
+                      height={isMobile ? '14' : '16'}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className={isDarkMode ? 'text-white' : 'text-black'}
+                    >
+                      <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                </div>
+
+                {/* Mobile: Max Label */}
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 md:hidden block mt-2`}>
+                  Max {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                </span>
+
+                {/* Max Price Input Container */}
+                <div
+                  className={`flex items-center rounded-lg border ${
+                    isDarkMode ? 'bg-[#211b1b] border-[#333333]' : 'bg-white border-[#d9d9d9]'
+                  }`}
+                >
+                  <button
+                    onClick={() => {
+                      const decrement = maxPrice * 0.01; // 1% decrease
+                      onMaxPriceChange?.(Math.max(0, maxPrice - decrement));
+                    }}
+                    className={`${isMobile ? 'p-2' : 'p-3'} transition-all flex-shrink-0 ${
+                      isDarkMode ? 'hover:bg-[#333333]' : 'hover:bg-[#f5f5f5]'
+                    }`}
+                  >
+                    <svg
+                      width={isMobile ? '14' : '16'}
+                      height={isMobile ? '14' : '16'}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className={isDarkMode ? 'text-white' : 'text-black'}
+                    >
+                      <path d="M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                  <input
+                    type="number"
+                    value={maxPrice.toFixed(10)}
+                    onChange={e => onMaxPriceChange?.(parseFloat(e.target.value) || 0)}
+                    className={`flex-1 min-w-0 bg-transparent text-center outline-none px-2 py-3 ${
+                      isMobile ? 'text-xs' : 'text-base'
+                    } ${isDarkMode ? 'text-white' : 'text-black'}`}
+                    step="0.0000000001"
+                  />
+                  <button
+                    onClick={() => {
+                      const increment = maxPrice * 0.01 || 0.0000000001; // 1% increase or minimum
+                      onMaxPriceChange?.(maxPrice + increment);
+                    }}
+                    className={`${isMobile ? 'p-2' : 'p-3'} transition-all flex-shrink-0 ${
+                      isDarkMode ? 'hover:bg-[#333333]' : 'hover:bg-[#f5f5f5]'
+                    }`}
+                  >
+                    <svg
+                      width={isMobile ? '14' : '16'}
+                      height={isMobile ? '14' : '16'}
+                      viewBox="0 0 16 16"
+                      fill="none"
+                      className={isDarkMode ? 'text-white' : 'text-black'}
+                    >
+                      <path d="M8 3V13M3 8H13" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           )}
 
