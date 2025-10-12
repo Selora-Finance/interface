@@ -148,7 +148,7 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
             <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>
-                  {asset0?.symbol || 'ETH'} price in {asset1?.symbol || 'CEDA'}
+                  {asset0?.symbol || 'Token0'} price in {asset1?.symbol || 'Token1'}
                 </span>
                 <button className="p-1 rounded hover:bg-gray-700 transition-colors">
                   <svg
@@ -169,7 +169,7 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
                 </button>
               </div>
               <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>
-                Current: {currentPrice.toFixed(5)} {asset0?.symbol || 'ETH'}/{asset1?.symbol || 'CEDA'}
+                Current: {currentPrice.toFixed(5)} {asset0?.symbol || 'Token0'}/{asset1?.symbol || 'Token1'}
               </span>
             </div>
           </div>
@@ -239,7 +239,7 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
                   </div>
                 )}
                 <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>
-                  {asset0?.symbol || 'ETH'}/{asset1?.symbol || 'CEDA'}
+                  {asset0?.symbol || 'Token0'}/{asset1?.symbol || 'Token1'}
                 </span>
               </div>
               <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>{feeTier}</span>
@@ -250,13 +250,13 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
               <div className={`flex flex-col gap-2 p-3 rounded-lg ${isDarkMode ? 'bg-[#0d0a0a]' : 'bg-[#e8e8e8]'}`}>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Min Price</span>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-normal`}>
-                  {minPrice.toFixed(4)} {asset0?.symbol || 'ETH'}/{asset1?.symbol || 'CEDA'}
+                  {minPrice.toFixed(4)} {asset0?.symbol || 'Token0'}/{asset1?.symbol || 'Token1'}
                 </span>
               </div>
               <div className={`flex flex-col gap-2 p-3 rounded-lg ${isDarkMode ? 'bg-[#0d0a0a]' : 'bg-[#e8e8e8]'}`}>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Max Price</span>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-normal`}>
-                  {maxPrice.toFixed(4)} {asset0?.symbol || 'ETH'}/{asset1?.symbol || 'CEDA'}
+                  {maxPrice.toFixed(4)} {asset0?.symbol || 'Token0'}/{asset1?.symbol || 'Token1'}
                 </span>
               </div>
             </div>
@@ -265,13 +265,13 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
             <div className="w-full grid grid-cols-2 gap-3">
               <div className={`flex flex-col gap-2 p-3 rounded-lg ${isDarkMode ? 'bg-[#0d0a0a]' : 'bg-[#e8e8e8]'}`}>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
-                  {asset0?.symbol || 'ETH'} Amount
+                  {asset0?.symbol || 'Token0'} Amount
                 </span>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-normal`}>{amount0 || '0'}</span>
               </div>
               <div className={`flex flex-col gap-2 p-3 rounded-lg ${isDarkMode ? 'bg-[#0d0a0a]' : 'bg-[#e8e8e8]'}`}>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
-                  {asset1?.symbol || 'CEDA'} Amount
+                  {asset1?.symbol || 'Token1'} Amount
                 </span>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} font-normal`}>{amount1 || '0'}</span>
               </div>

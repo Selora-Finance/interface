@@ -37,7 +37,7 @@ export default function StandardLiquidity() {
 
   return (
     <>
-      <div className="flex w-svw flex-1 justify-center items-start flex-col md:flex-row gap-4 md:gap-6 py-6 md:py-12 my-36 mx-auto relative px-3 max-w-[90rem]">
+      <div className="flex w-svw flex-1 justify-center items-center flex-col gap-4 py-6 md:py-12 my-36 mx-auto relative px-3">
         <StandardLiquidityView
           asset0={asset0}
           asset1={asset1}

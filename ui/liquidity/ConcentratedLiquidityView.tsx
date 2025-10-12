@@ -146,7 +146,7 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
               <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Current Price</span>
               <div className="flex items-center gap-2">
                 <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>
-                  {currentPrice.toFixed(10)} {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                  {currentPrice.toFixed(10)} {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
                 </span>
                 <button className="p-1 rounded hover:bg-gray-700 transition-colors">
                   <svg
@@ -303,10 +303,10 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
               {/* Labels */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
-                  Min {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                  Min {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
                 </span>
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 md:block hidden`}>
-                  Max {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                  Max {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
                 </span>
               </div>
 
@@ -369,7 +369,7 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
 
                 {/* Mobile: Max Label */}
                 <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 md:hidden block mt-2`}>
-                  Max {asset0?.symbol || 'ETH'} per {asset1?.symbol || 'CEDA'}
+                  Max {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
                 </span>
 
                 {/* Max Price Input Container */}
