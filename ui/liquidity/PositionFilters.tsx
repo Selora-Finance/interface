@@ -1,27 +1,25 @@
 'use client';
 
-import { Themes, MAX_SCREEN_SIZES } from '@/constants';
+import { MAX_SCREEN_SIZES, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
-import { useWindowDimensions } from '@/hooks/utils';
 import { Plus } from 'lucide-react';
+import { useWindowDimensions } from '@/hooks/utils';
 
-type PoolType = 'concentrated' | 'stable' | 'volatile';
-
-interface PoolFiltersProps {
-  activeFilter: PoolType | 'all';
-  onFilterChange: (filter: PoolType | 'all') => void;
-  onCreatePool?: (type: PoolType) => void;
+interface PositionFiltersProps {
+  activeFilter: 'all' | 'concentrated' | 'stable' | 'volatile';
+  onFilterChange: (filter: 'all' | 'concentrated' | 'stable' | 'volatile') => void;
+  onCreatePool?: (poolType: string) => void;
 }
 
-const PoolFilters: React.FC<PoolFiltersProps> = ({ activeFilter, onFilterChange, onCreatePool }) => {
+const PositionFilters: React.FC<PositionFiltersProps> = ({ activeFilter, onFilterChange, onCreatePool }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
 
-  const filters: { type: PoolType; label: string }[] = [
+  const filters: { type: 'concentrated' | 'stable' | 'volatile'; label: string }[] = [
     { type: 'concentrated', label: 'Concentrated' },
     { type: 'stable', label: 'Stable' },
     { type: 'volatile', label: 'Volatile' },
@@ -76,4 +74,4 @@ const PoolFilters: React.FC<PoolFiltersProps> = ({ activeFilter, onFilterChange,
   );
 };
 
-export default PoolFilters;
+export default PositionFilters;

@@ -7,6 +7,7 @@ import {
   ResponsiveContainer,
   XAxis,
   YAxis,
+  CartesianGrid,
   ReferenceLine,
   ReferenceArea,
   Label,
@@ -771,6 +772,13 @@ const LineChart: React.FC<LineChartProps> = ({
                 <stop offset="100%" stopColor={rangeColor} stopOpacity={0.1} />
               </linearGradient>
             </defs>
+            <CartesianGrid
+              stroke={isDarkMode ? '#333333' : '#e5e7eb'}
+              strokeDasharray="3 3"
+              strokeOpacity={isDarkMode ? 0.6 : 0.8}
+              vertical={true}
+              horizontal={true}
+            />
             <XAxis
               dataKey="x"
               type="number"
