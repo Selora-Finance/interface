@@ -49,13 +49,13 @@ export function Slider({
     if (disabled) return;
     e.preventDefault();
     setIsDragging(true);
-    updateValue(e);
+    updateValueFromClientX(e.clientX);
   };
 
   const handleMouseMove = (e: MouseEvent) => {
     if (isDragging && !disabled) {
       e.preventDefault();
-      updateValue(e);
+      updateValueFromClientX(e.clientX);
     }
   };
 
@@ -75,13 +75,15 @@ export function Slider({
     if (disabled) return;
     e.preventDefault();
     setIsDragging(true);
-    updateValue(e.touches[0]);
+    const touch = e.touches[0];
+    if (touch) updateValueFromClientX(touch.clientX);
   };
 
   const handleTouchMove = (e: TouchEvent) => {
     if (isDragging && !disabled) {
       e.preventDefault();
-      updateValue(e.touches[0]);
+      const touch = e.touches[0];
+      if (touch) updateValueFromClientX(touch.clientX);
     }
   };
 
@@ -89,11 +91,11 @@ export function Slider({
     setIsDragging(false);
   };
 
-  const updateValue = (e: MouseEvent | React.MouseEvent | Touch) => {
+  const updateValueFromClientX = (clientX: number) => {
     if (!sliderRef.current) return;
 
     const rect = sliderRef.current.getBoundingClientRect();
-    const x = e.clientX - rect.left;
+    const x = clientX - rect.left;
     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
 
     // Calculate the actual value based on min/max range
