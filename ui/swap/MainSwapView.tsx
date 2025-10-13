@@ -45,7 +45,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
               <button className="bg-transparent outline-0 flex justify-center items-center cursor-pointer hover:bg-[#dcdcdc]/40 py-1 px-1 rounded-lg">
                 <Settings />
               </button>
-              <span>0.0 ETH</span>
+              <span>0.0 {asset0?.symbol || 'Token0'}</span>
             </div>
             <div className="border border-[#333333] w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2">
               <Button
@@ -94,7 +94,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
           <div className="flex flex-col justify-start items-center gap-4 w-full">
             <div className="flex justify-between items-center w-full">
               <span>Buy</span>
-              <span>0.0 ETH</span>
+              <span>0.0 {asset0?.symbol || 'Token0'}</span>
             </div>
             <div className="border border-[#333333] w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2">
               <Button
