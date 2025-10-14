@@ -26,6 +26,10 @@ body {
   padding: 0;
 }
 
+button {
+  cursor: pointer;
+}
+
 /* Floating Animations for Background Blobs */
 @keyframes float1 {
   0%,

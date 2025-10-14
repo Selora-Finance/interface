@@ -2,12 +2,14 @@
 
 import { Card } from '@/components';
 import { Themes } from '@/constants';
-import { themeAtom } from '@/store';
+import { routerTypeAtom, slippageToleranceAtom, themeAtom } from '@/store';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 
 const SwapDetails: React.FC = () => {
   const [theme] = useAtom(themeAtom);
+  const [slippageTolerance] = useAtom(slippageToleranceAtom);
+  const [routerType] = useAtom(routerTypeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   return (
     <div className="flex justify-center items-center w-full md:w-1/4">
@@ -19,24 +21,24 @@ const SwapDetails: React.FC = () => {
       >
         <div className="flex flex-col justify-start w-full items-center gap-4">
           <div className="w-full justify-between items-center flex gap-3">
-            <span>Slippage Tolerance</span>
-            <span>10%</span>
+            <span className="text-sm text-gray-500">Slippage Tolerance</span>
+            <span className="text-sm">{slippageTolerance}%</span>
           </div>
           <div className="w-full justify-between items-center flex gap-3">
-            <span>Exchange Rate</span>
-            <span>--</span>
+            <span className="text-sm text-gray-500">Exchange Rate</span>
+            <span className="text-sm">--</span>
           </div>
           <div className="w-full justify-between items-center flex gap-3">
-            <span>Price Impact</span>
-            <span>0%</span>
+            <span className="text-sm text-gray-500">Price Impact</span>
+            <span className="text-sm">0%</span>
           </div>
           <div className="w-full justify-between items-center flex gap-3">
-            <span>Minimum Received</span>
-            <span>--</span>
+            <span className="text-sm text-gray-500">Minimum Received</span>
+            <span className="text-sm">--</span>
           </div>
           <div className="w-full justify-between items-center flex gap-3">
-            <span>Router</span>
-            <span className="text-[#d0de27]">Auto</span>
+            <span className="text-sm text-gray-500">Router</span>
+            <span className="text-[#d0de27] text-sm">{routerType}</span>
           </div>
         </div>
       </Card>

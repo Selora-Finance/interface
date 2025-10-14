@@ -1,16 +1,19 @@
 'use client';
 
 import { Card } from '@/components';
-import { Themes } from '@/constants';
+import { MAX_SCREEN_SIZES, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 import DashboardCard from '@/ui/dashboard/DashboardCard';
 import { useRouter } from 'next/navigation';
+import { useWindowDimensions } from '@/hooks/utils';
 
 const DashboardPage = () => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
+  const dimensions = useWindowDimensions();
+  const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
   const router = useRouter();
 
   const dashboardCards = [
@@ -64,7 +67,7 @@ const DashboardPage = () => {
       >
         {/* Header Section */}
         <div className="w-full flex flex-col gap-4 text-left">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">Manage Your Position Balances</h1>
+          <h1 className={`${isMobile ? 'text-xl' : 'text-3xl md:text-4xl'} font-normal`}>Manage or Add Liquidity</h1>
           <p className="text-lg md:text-xl text-gray-500 max-w-2xl">
             Navigate the dashboard to view and manage your positions, locks, and claim all your rewards.
           </p>

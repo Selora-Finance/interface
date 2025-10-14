@@ -11,6 +11,20 @@ import { store, themeAtom } from '@/store';
 import { Themes } from '@/constants';
 import { AssetsListProvider } from '@/context/assets';
 
+const RKProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const [theme] = useAtom(themeAtom);
+  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
+  const kitTheme = useMemo(() => {
+    return isDarkMode ? darkTheme() : lightTheme();
+  }, [isDarkMode]);
+
+  return (
+    <RainbowKitProvider modalSize="compact" theme={kitTheme} key={theme}>
+      {children}
+    </RainbowKitProvider>
+  );
+};
+
 export const RootProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [queryClient] = useState(() => new QueryClient());
 
@@ -19,18 +33,7 @@ export const RootProvider: React.FC<{ children: React.ReactNode }> = ({ children
       <QueryClientProvider client={queryClient}>
         <AssetsListProvider>
           <JotaiProvider store={store}>
-            {(() => {
-              const [theme] = useAtom(themeAtom);
-              const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
-              const kitTheme = useMemo(() => {
-                return isDarkMode ? darkTheme() : lightTheme();
-              }, [isDarkMode]);
-              return (
-                <RainbowKitProvider modalSize="compact" theme={kitTheme} key={theme}>
-                  {children}
-                </RainbowKitProvider>
-              );
-            })()}
+            <RKProvider>{children}</RKProvider>
           </JotaiProvider>
         </AssetsListProvider>
       </QueryClientProvider>

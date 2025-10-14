@@ -37,13 +37,23 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
 
-  // Calculate TVL
-  const tvl = useMemo(() => {
-    const amt0 = parseFloat(amount0) || 0;
-    const amt1 = parseFloat(amount1) || 0;
-    // Mock calculation - in real app, this would use actual prices
-    return (amt0 * 2000 + amt1 * 0.5).toFixed(2);
-  }, [amount0, amount1]);
+  // // Calculate TVL
+  // const tvl = useMemo(() => {
+  //   const amt0 = parseFloat(amount0) || 0;
+  //   const amt1 = parseFloat(amount1) || 0;
+  //   // Mock calculation - in real app, this would use actual prices
+  //   return (amt0 * 2000 + amt1 * 0.5).toFixed(2);
+  // }, [amount0, amount1]);
+
+  // Deterministic pseudo-random number generator (seeded)
+  function mulberry32(seed: number) {
+    return function () {
+      let t = (seed += 0x6d2b79f5);
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
 
   // Generate chart data with realistic price movement using Geometric Brownian Motion
   const chartData = useMemo(() => {
@@ -75,6 +85,9 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
     const supportLevel = currentPrice * 0.75;
     const resistanceLevel = currentPrice * 1.15;
 
+    // Use a stable seed based on currentPrice for deterministic results
+    const rand = mulberry32(Math.floor(currentPrice * 1e8));
+
     for (let i = 0; i < totalPoints; i++) {
       const progress = i / totalPoints;
 
@@ -87,8 +100,8 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
         }
       }
 
-      // Generate random component (Wiener process)
-      const randomShock = (Math.random() - 0.5) * 2;
+      // Generate random component (Wiener process) using deterministic PRNG
+      const randomShock = (rand() - 0.5) * 2;
 
       // Geometric Brownian Motion formula with trend bias
       const dPrice = price * ((drift + phaseBias) * dt + volatility * Math.sqrt(dt) * randomShock);
@@ -96,9 +109,9 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
 
       // Add mean reversion near support/resistance
       if (price < supportLevel) {
-        price = supportLevel + (price - supportLevel) * 0.3 + Math.random() * currentPrice * 0.02;
+        price = supportLevel + (price - supportLevel) * 0.3 + rand() * currentPrice * 0.02;
       } else if (price > resistanceLevel) {
-        price = resistanceLevel - (resistanceLevel - price) * 0.3 - Math.random() * currentPrice * 0.02;
+        price = resistanceLevel - (resistanceLevel - price) * 0.3 - rand() * currentPrice * 0.02;
       }
 
       // Add micro-structure (intraday patterns)
@@ -148,9 +161,9 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
             <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>
-                  {asset0?.symbol || 'Token0'} price in {asset1?.symbol || 'Token1'}
+                  {asset1?.symbol || 'Token0'} price in {asset0?.symbol || 'Token1'}
                 </span>
-                <button className="p-1 rounded hover:bg-gray-700 transition-colors">
+                {/* <button className="p-1 rounded hover:bg-gray-700 transition-colors">
                   <svg
                     width="16"
                     height="16"
@@ -166,10 +179,10 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
                       strokeLinejoin="round"
                     />
                   </svg>
-                </button>
+                </button> */}
               </div>
               <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>
-                Current: {currentPrice.toFixed(5)} {asset0?.symbol || 'Token0'}/{asset1?.symbol || 'Token1'}
+                Current: {currentPrice.toFixed(5)} {asset1?.symbol || 'Token0'}/{asset0?.symbol || 'Token1'}
               </span>
             </div>
           </div>
