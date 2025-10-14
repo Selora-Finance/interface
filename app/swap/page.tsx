@@ -2,9 +2,10 @@
 
 import { useAssetList } from '@/context/assets';
 import AssetListModal from '@/ui/AssetListModal';
+import SettingsModal from '@/ui/SettingsModal';
 import MainSwapView from '@/ui/swap/MainSwapView';
 import SwapDetails from '@/ui/swap/SwapDetails';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Address, getAddress, zeroAddress } from 'viem';
 
 export default function Swap() {
@@ -13,6 +14,15 @@ export default function Swap() {
 
   const [showModal0, setShowModal0] = useState<boolean>(false);
   const [showModal1, setShowModal1] = useState<boolean>(false);
+  const [showSettings, setShowSettings] = useState<boolean>(false);
+
+  const onSwitchClick = useCallback(() => {
+    const mutableAddress0 = address0;
+    const mutableAddress1 = address1;
+    setAddress0(mutableAddress1);
+    setAddress1(mutableAddress0);
+  }, [address0, address1]);
+
   // Assets list
   const assets = useAssetList();
   const [asset0, asset1] = useMemo(() => {
@@ -26,6 +36,8 @@ export default function Swap() {
           asset1={asset1}
           onSelector0Click={() => setShowModal0(true)}
           onSelector1Click={() => setShowModal1(true)}
+          onSwitchClick={onSwitchClick}
+          onSettingsClick={() => setShowSettings(true)}
         />
         <SwapDetails />
       </div>
@@ -47,6 +59,7 @@ export default function Swap() {
         }}
         onClose={() => setShowModal1(false)}
       />
+      <SettingsModal show={showSettings} onHide={() => setShowSettings(false)} />
     </>
   );
 }

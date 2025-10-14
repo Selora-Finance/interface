@@ -9,4 +9,10 @@ export enum Themes {
   DARK = 'dark',
 }
 
+export enum RouterType {
+  AUTO = 'Auto',
+  V2 = 'V2',
+  V3 = 'V3',
+}
+
 export const DEFAULT_PROCESS_DURATION = 5000;

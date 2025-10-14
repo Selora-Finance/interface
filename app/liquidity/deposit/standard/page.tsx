@@ -2,7 +2,8 @@
 
 import { useAssetList } from '@/context/assets';
 import AssetListModal from '@/ui/AssetListModal';
-import { StandardLiquidityView, StandardLiquidityDetails } from '@/ui/liquidity';
+import StandardLiquidityView from '@/ui/liquidity/StandardLiquidityView';
+import StandardLiquidityDetails from '@/ui/liquidity/StandardLiquidityDetails';
 import { useMemo, useState } from 'react';
 import { Address, getAddress, zeroAddress } from 'viem';
 import { useRouter } from 'next/navigation';

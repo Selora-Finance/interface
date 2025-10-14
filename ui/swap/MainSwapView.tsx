@@ -17,6 +17,7 @@ interface MainSwapViewProps {
   onSelector0Click?: () => void;
   onSelector1Click?: () => void;
   onSwitchClick?: () => void;
+  onSettingsClick?: () => void;
 }
 
 const MainSwapView: React.FC<MainSwapViewProps> = ({
@@ -25,6 +26,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
   onSelector0Click,
   onSelector1Click,
   onSwitchClick,
+  onSettingsClick,
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
@@ -41,11 +43,14 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
         <div className="w-full flex flex-col gap-7 justify-start items-center">
           <div className="flex flex-col justify-start items-center gap-4 w-full">
             <div className="flex justify-between items-center w-full">
-              <span>Sell</span>
-              <button className="bg-transparent outline-0 flex justify-center items-center cursor-pointer hover:bg-[#dcdcdc]/40 py-1 px-1 rounded-lg">
+              <span className="text-sm">Sell</span>
+              <button
+                onClick={onSettingsClick}
+                className="bg-transparent outline-0 flex justify-center items-center cursor-pointer hover:bg-[#dcdcdc]/40 py-1 px-1 rounded-lg"
+              >
                 <Settings />
               </button>
-              <span>0.0 {asset0?.symbol || 'Token0'}</span>
+              <span className="text-sm text-gray-500">0.0 {asset0?.symbol || 'Token0'}</span>
             </div>
             <div className="border border-[#333333] w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2">
               <Button
@@ -87,14 +92,14 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
                 isDarkMode ? 'bg-[#333333]' : 'bg-[#fff] border border-[#333333]'
               } absolute rounded-lg outline-0 flex justify-center items-center cursor-pointer py-3 px-3`}
             >
-              <MdSwapVert size={30} />
+              <MdSwapVert size={isMobile ? 14 : 15} />
             </button>
           </div>
 
           <div className="flex flex-col justify-start items-center gap-4 w-full">
             <div className="flex justify-between items-center w-full">
-              <span>Buy</span>
-              <span>0.0 {asset0?.symbol || 'Token0'}</span>
+              <span className="text-sm">Buy</span>
+              <span className="text-sm text-gray-500">0.0 {asset1?.symbol || 'Token1'}</span>
             </div>
             <div className="border border-[#333333] w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2">
               <Button

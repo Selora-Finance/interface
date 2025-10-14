@@ -2,13 +2,15 @@
 
 import { useAssetList } from '@/context/assets';
 import AssetListModal from '@/ui/AssetListModal';
-import { ConcentratedLiquidityView, CLRangeView } from '@/ui/liquidity';
-import { useMemo, useState } from 'react';
+import ConcentratedLiquidityView from '@/ui/liquidity/ConcentratedLiquidityView';
+import CLRangeView from '@/ui/liquidity/CLRangeView';
+import { useCallback, useMemo, useState } from 'react';
 import { Address, getAddress, zeroAddress } from 'viem';
 import { useRouter } from 'next/navigation';
 import { Settings, ArrowLeft } from 'lucide-react';
 import { useWindowDimensions } from '@/hooks/utils';
 import { MAX_SCREEN_SIZES } from '@/constants';
+import SettingsModal from '@/ui/SettingsModal';
 
 type RangePreset = 'passive' | 'wide' | 'narrow' | 'aggressive' | 'intense';
 
@@ -25,6 +27,8 @@ export default function ConcentratedLiquidity() {
   const [rangePreset, setRangePreset] = useState<RangePreset>('passive');
   const [amount0, setAmount0] = useState<string>('');
   const [amount1, setAmount1] = useState<string>('');
+
+  const [showSettings, setShowSettings] = useState<boolean>(false);
 
   // Handle range type change and initialize custom prices
   const handleRangeTypeChange = (type: 'preset' | 'custom') => {
@@ -54,8 +58,7 @@ export default function ConcentratedLiquidity() {
     return [assets.find(asset => asset.address === address0), assets.find(asset => asset.address === address1)];
   }, [assets, address0, address1]);
 
-  // Calculate current price (mock)
-  const currentPrice = 0.00002454738;
+  const [currentPrice, setCurrentPrice] = useState<number>(0); // Mock current price
 
   // State for custom price range (can be adjusted by dragging)
   const [customMinPrice, setCustomMinPrice] = useState<number | null>(null);
@@ -108,6 +111,13 @@ export default function ConcentratedLiquidity() {
     router.push('/liquidity/deposit/standard');
   };
 
+  const handleSwitchClick = useCallback(() => {
+    const temp0 = address0;
+    const temp1 = address1;
+    setAddress0(temp1);
+    setAddress1(temp0);
+  }, [address0, address1]);
+
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
 
@@ -118,7 +128,7 @@ export default function ConcentratedLiquidity() {
         <div className="flex justify-between items-center w-full">
           <h2 className={`${isMobile ? 'text-lg' : 'text-xl'} font-semibold`}>Concentrated Liquidity</h2>
           <button
-            onClick={() => {}}
+            onClick={() => setShowSettings(true)}
             className="p-1 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
           >
             <Settings size={20} />
@@ -164,6 +174,8 @@ export default function ConcentratedLiquidity() {
             maxPrice={maxPrice}
             onMinPriceChange={setCustomMinPrice}
             onMaxPriceChange={setCustomMaxPrice}
+            onCurrentPriceChange={setCurrentPrice}
+            onSwitchClick={handleSwitchClick}
           />
           <CLRangeView
             asset0={asset0}
@@ -196,6 +208,7 @@ export default function ConcentratedLiquidity() {
         }}
         onClose={() => setShowModal1(false)}
       />
+      <SettingsModal show={showSettings} onHide={() => setShowSettings(false)} />
     </>
   );
 }

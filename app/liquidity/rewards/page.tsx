@@ -91,7 +91,9 @@ export default function LiquidityRewardsPage() {
   return (
     <div className="flex w-full flex-1 justify-center items-start flex-col gap-8 py-6 md:py-12 my-24 md:my-36 mx-auto relative px-3 md:px-6 max-w-[90rem]">
       {/* Title */}
-      <h2 className="text-2xl md:text-3xl font-bold">Your Liquidity Rewards</h2>
+      <h2 className={`text-2xl md:text-3xl font-bold ${isDarkMode ? 'text-white' : 'text-black'}`}>
+        Your Liquidity Rewards
+      </h2>
 
       {/* Table Section */}
       <div className="w-full flex flex-col gap-6">
