@@ -1,20 +1,26 @@
 'use client';
 
 import { Button } from '@/components';
-import { Themes, MAX_SCREEN_SIZES } from '@/constants';
-import { themeAtom } from '@/store';
-import { useAtom } from 'jotai';
+import { MAX_SCREEN_SIZES } from '@/constants';
 import { useMemo } from 'react';
 import { useWindowDimensions } from '@/hooks/utils';
+import { formatNumber } from '@/lib/client/utils';
 
 interface LiquidityHeroProps {
-  totalPools: number;
+  totalPools?: number | string;
+  tvl?: number | string;
+  fees?: number | string;
+  volume?: number | string;
   onDepositClick?: () => void;
 }
 
-const LiquidityHero: React.FC<LiquidityHeroProps> = ({ totalPools, onDepositClick }) => {
-  const [theme] = useAtom(themeAtom);
-  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
+const LiquidityHero: React.FC<LiquidityHeroProps> = ({
+  totalPools = 0,
+  tvl = 0,
+  fees = 0,
+  volume = 0,
+  onDepositClick,
+}) => {
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
 
@@ -27,7 +33,8 @@ const LiquidityHero: React.FC<LiquidityHeroProps> = ({ totalPools, onDepositClic
             Liquidity Providers make low-slippage swaps possible. Deposit and Stake liquidity to earn TEOS.
           </h2>
           <p className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>
-            There are currently <span className="text-[#d0de27] font-semibold">{totalPools} Unique Pairs</span>
+            There are currently{' '}
+            <span className="text-[#d0de27] font-semibold">{formatNumber(totalPools)} Unique Pairs</span>
           </p>
         </div>
       </div>
@@ -37,15 +44,21 @@ const LiquidityHero: React.FC<LiquidityHeroProps> = ({ totalPools, onDepositClic
         <div className="flex flex-wrap gap-6 md:gap-10 items-center">
           <div className="flex flex-col gap-2">
             <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>TVL</span>
-            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>~$680.52M</span>
+            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>
+              ~{formatNumber(tvl, undefined, undefined, true)}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Fees</span>
-            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>~$94,401.32</span>
+            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>
+              ~{formatNumber(fees, undefined, undefined, true)}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Volume</span>
-            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>~$832.40M</span>
+            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>
+              ~{formatNumber(volume, undefined, undefined, true)}
+            </span>
           </div>
         </div>
         <Button
