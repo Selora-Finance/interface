@@ -1,467 +1,511 @@
 export default [
   {
-    type: 'constructor',
-    payable: false,
     inputs: [
       {
-        type: 'address',
+        internalType: 'address',
         name: 'newOwner',
-      },
-      {
-        type: 'address[]',
-        name: '_routers',
-      },
-      {
-        type: 'uint64',
-        name: '_swapFeePercentage',
-      },
-      {
         type: 'address',
+      },
+      {
+        internalType: 'contract IBaseRouter[]',
+        name: '_routers',
+        type: 'address[]',
+      },
+      {
+        internalType: 'uint64',
+        name: '_swapFeePercentage',
+        type: 'uint64',
+      },
+      {
+        internalType: 'contract IWETH',
         name: '_weth',
+        type: 'address',
       },
       {
-        type: 'address[]',
+        internalType: 'address[]',
         name: '_trustedTokens',
+        type: 'address[]',
       },
     ],
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
-    type: 'error',
+    inputs: [],
     name: 'FeePercentageTooHigh',
-    inputs: [],
+    type: 'error',
   },
   {
-    type: 'error',
+    inputs: [],
     name: 'InsufficientAmountOut',
-    inputs: [],
+    type: 'error',
   },
   {
-    type: 'error',
-    name: 'InvalidContract',
     inputs: [
       {
-        type: 'address',
+        internalType: 'address',
         name: 'addr',
+        type: 'address',
       },
     ],
+    name: 'InvalidContract',
+    type: 'error',
   },
   {
-    type: 'error',
+    inputs: [],
     name: 'NoActiveRouters',
-    inputs: [],
+    type: 'error',
   },
   {
-    type: 'error',
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'tokenA',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'tokenB',
+        type: 'address',
+      },
+    ],
     name: 'NoSwapRoute',
-    inputs: [
-      {
-        type: 'address',
-        name: 'tokenA',
-      },
-      {
-        type: 'address',
-        name: 'tokenB',
-      },
-    ],
+    type: 'error',
   },
   {
-    type: 'error',
-    name: 'OwnableInvalidOwner',
     inputs: [
       {
-        type: 'address',
+        internalType: 'address',
         name: 'owner',
+        type: 'address',
       },
     ],
-  },
-  {
+    name: 'OwnableInvalidOwner',
     type: 'error',
-    name: 'OwnableUnauthorizedAccount',
+  },
+  {
     inputs: [
       {
-        type: 'address',
+        internalType: 'address',
         name: 'account',
+        type: 'address',
       },
     ],
+    name: 'OwnableUnauthorizedAccount',
+    type: 'error',
   },
   {
-    type: 'event',
     anonymous: false,
-    name: 'OwnershipTransferred',
     inputs: [
       {
-        type: 'address',
+        indexed: true,
+        internalType: 'address',
         name: 'previousOwner',
-        indexed: true,
+        type: 'address',
       },
       {
-        type: 'address',
-        name: 'newOwner',
         indexed: true,
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
       },
     ],
+    name: 'OwnershipTransferred',
+    type: 'event',
   },
   {
-    type: 'function',
+    inputs: [],
     name: 'ETHER',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [],
     outputs: [
       {
+        internalType: 'address',
+        name: '',
         type: 'address',
       },
     ],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
+    inputs: [],
     name: 'MAX_FEE_PERCENTAGE',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [],
     outputs: [
       {
+        internalType: 'uint64',
+        name: '',
         type: 'uint64',
       },
     ],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
+    inputs: [],
     name: 'MAX_PERCENTAGE',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [],
     outputs: [
       {
+        internalType: 'uint64',
+        name: '',
         type: 'uint64',
       },
     ],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
-    type: 'function',
-    name: 'addRouters',
-    constant: false,
-    payable: false,
     inputs: [
       {
-        type: 'address[]',
+        internalType: 'contract IBaseRouter[]',
         name: '_routers',
-      },
-    ],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'execute',
-    constant: false,
-    stateMutability: 'payable',
-    payable: true,
-    inputs: [
-      {
-        type: 'address',
-        name: 'tokenA',
-      },
-      {
-        type: 'address',
-        name: 'tokenB',
-      },
-      {
-        type: 'address',
-        name: 'to',
-      },
-      {
-        type: 'uint256',
-        name: 'amountIn',
-      },
-      {
-        type: 'uint256',
-        name: 'amountOut',
-      },
-      {
-        type: 'uint8',
-        name: 'swapType',
-      },
-      {
-        type: 'uint256',
-        name: 'deadline',
-      },
-    ],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'findBestRoute',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [
-      {
-        type: 'address',
-        name: 'tokenA',
-      },
-      {
-        type: 'address',
-        name: 'tokenB',
-      },
-      {
-        type: 'uint256',
-        name: 'amountIn',
-      },
-    ],
-    outputs: [
-      {
-        type: 'tuple[]',
-        name: 'results',
-        components: [
-          {
-            type: 'address',
-            name: 'tokenIn',
-          },
-          {
-            type: 'address',
-            name: 'tokenOut',
-          },
-          {
-            type: 'uint256',
-            name: 'amountIn',
-          },
-          {
-            type: 'uint256',
-            name: 'amountOut',
-          },
-          {
-            type: 'address',
-            name: 'router',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'isActiveRouter',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [
-      {
-        type: 'address',
-      },
-    ],
-    outputs: [
-      {
-        type: 'bool',
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'owner',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [],
-    outputs: [
-      {
-        type: 'address',
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'query',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [
-      {
-        type: 'address',
-        name: 'tokenA',
-      },
-      {
-        type: 'address',
-        name: 'tokenB',
-      },
-      {
-        type: 'uint256',
-        name: 'amountIn',
-      },
-    ],
-    outputs: [
-      {
-        type: 'tuple',
-        name: 'bestResult',
-        components: [
-          {
-            type: 'address',
-            name: 'tokenIn',
-          },
-          {
-            type: 'address',
-            name: 'tokenOut',
-          },
-          {
-            type: 'uint256',
-            name: 'amountIn',
-          },
-          {
-            type: 'uint256',
-            name: 'amountOut',
-          },
-          {
-            type: 'address',
-            name: 'router',
-          },
-        ],
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'renounceOwnership',
-    constant: false,
-    payable: false,
-    inputs: [],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'routers',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [
-      {
-        type: 'uint256',
-      },
-    ],
-    outputs: [
-      {
-        type: 'address',
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'sendOutERC20',
-    constant: false,
-    payable: false,
-    inputs: [
-      {
-        type: 'address',
-        name: 'token',
-      },
-      {
-        type: 'address',
-        name: 'to',
-      },
-      {
-        type: 'uint256',
-        name: 'amount',
-      },
-    ],
-    outputs: [
-      {
-        type: 'bool',
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'setSwapFeePercentage',
-    constant: false,
-    payable: false,
-    inputs: [
-      {
-        type: 'uint64',
-        name: '_swapFeePercentage',
-      },
-    ],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'setTrustedTokens',
-    constant: false,
-    payable: false,
-    inputs: [
-      {
         type: 'address[]',
-        name: '_trustedTokens',
       },
     ],
+    name: 'addRouters',
     outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
-    type: 'function',
-    name: 'swapFeePercentage',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [],
-    outputs: [
-      {
-        type: 'uint64',
-      },
-    ],
-  },
-  {
-    type: 'function',
-    name: 'switchRouterActiveStatus',
-    constant: false,
-    payable: false,
     inputs: [
       {
+        internalType: 'address',
+        name: 'tokenA',
         type: 'address',
-        name: 'router',
       },
-    ],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'transferOwnership',
-    constant: false,
-    payable: false,
-    inputs: [
       {
+        internalType: 'address',
+        name: 'tokenB',
         type: 'address',
-        name: 'newOwner',
       },
-    ],
-    outputs: [],
-  },
-  {
-    type: 'function',
-    name: 'trustedTokens',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [
       {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amountOut',
+        type: 'uint256',
+      },
+      {
+        internalType: 'enum SwapExecutor.SwapType',
+        name: 'swapType',
+        type: 'uint8',
+      },
+      {
+        internalType: 'uint256',
+        name: 'deadline',
         type: 'uint256',
       },
     ],
-    outputs: [
-      {
-        type: 'address',
-      },
-    ],
+    name: 'execute',
+    outputs: [],
+    stateMutability: 'payable',
+    type: 'function',
   },
   {
-    type: 'function',
-    name: 'weth',
-    constant: true,
-    stateMutability: 'view',
-    payable: false,
-    inputs: [],
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'tokenA',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'tokenB',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
+      },
+    ],
+    name: 'findBestRoute',
     outputs: [
       {
+        components: [
+          {
+            internalType: 'address',
+            name: 'tokenIn',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'tokenOut',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'amountIn',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'amountOut',
+            type: 'uint256',
+          },
+          {
+            internalType: 'contract IBaseRouter',
+            name: 'router',
+            type: 'address',
+          },
+        ],
+        internalType: 'struct SwapExecutor.QueryResult[]',
+        name: 'results',
+        type: 'tuple[]',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: '',
         type: 'address',
       },
     ],
+    name: 'isActiveRouter',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'owner',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'tokenA',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'tokenB',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amountIn',
+        type: 'uint256',
+      },
+    ],
+    name: 'query',
+    outputs: [
+      {
+        components: [
+          {
+            internalType: 'address',
+            name: 'tokenIn',
+            type: 'address',
+          },
+          {
+            internalType: 'address',
+            name: 'tokenOut',
+            type: 'address',
+          },
+          {
+            internalType: 'uint256',
+            name: 'amountIn',
+            type: 'uint256',
+          },
+          {
+            internalType: 'uint256',
+            name: 'amountOut',
+            type: 'uint256',
+          },
+          {
+            internalType: 'contract IBaseRouter',
+            name: 'router',
+            type: 'address',
+          },
+        ],
+        internalType: 'struct SwapExecutor.QueryResult',
+        name: 'bestResult',
+        type: 'tuple',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'renounceOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'routers',
+    outputs: [
+      {
+        internalType: 'contract IBaseRouter',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IERC20',
+        name: 'token',
+        type: 'address',
+      },
+      {
+        internalType: 'address',
+        name: 'to',
+        type: 'address',
+      },
+      {
+        internalType: 'uint256',
+        name: 'amount',
+        type: 'uint256',
+      },
+    ],
+    name: 'sendOutERC20',
+    outputs: [
+      {
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint64',
+        name: '_swapFeePercentage',
+        type: 'uint64',
+      },
+    ],
+    name: 'setSwapFeePercentage',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address[]',
+        name: '_trustedTokens',
+        type: 'address[]',
+      },
+    ],
+    name: 'setTrustedTokens',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'swapFeePercentage',
+    outputs: [
+      {
+        internalType: 'uint64',
+        name: '',
+        type: 'uint64',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'contract IBaseRouter',
+        name: 'router',
+        type: 'address',
+      },
+    ],
+    name: 'switchRouterActiveStatus',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
+    ],
+    name: 'transferOwnership',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      {
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
+    ],
+    name: 'trustedTokens',
+    outputs: [
+      {
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'weth',
+    outputs: [
+      {
+        internalType: 'contract IWETH',
+        name: '',
+        type: 'address',
+      },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    stateMutability: 'payable',
+    type: 'receive',
   },
 ] as const;
