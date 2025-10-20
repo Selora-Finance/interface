@@ -38,3 +38,13 @@ export function useSetTimeout(cb: () => void, delay = DEFAULT_PROCESS_DURATION) 
     return () => clearTimeout(timeout);
   }, [cb, delay]);
 }
+
+export function useAtomicDate(delay: number = 1000) {
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentDateTime(new Date()), delay);
+    return () => clearInterval(interval);
+  }, [delay]);
+  return currentDateTime;
+}

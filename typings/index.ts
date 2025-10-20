@@ -17,6 +17,11 @@ export const AssetResponseSchema = zod.array(
 export type AssetType = zod.infer<typeof AssetResponseSchema.element>;
 export type AssetResponseType = zod.infer<typeof AssetResponseSchema>;
 
+export type Composition = {
+  bytes: `0x${string}`;
+  value?: bigint;
+};
+
 export interface PositionData {
   id: string;
   token0: {

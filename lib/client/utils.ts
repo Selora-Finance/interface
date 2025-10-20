@@ -1,3 +1,4 @@
+import { BASE_POINT } from '@/constants';
 import { Pool } from '@/gql/codegen/graphql';
 import { AssetType, PoolData } from '@/typings';
 import { clsx } from 'clsx';
@@ -67,4 +68,11 @@ export function mapGQLPool(gqlPools: Pool[], assetLookupFunction?: (id?: string)
     };
     return data;
   });
+}
+
+export function applySlippage(slippage: number, originalAmount: bigint | number): bigint {
+  if (typeof originalAmount === 'number') originalAmount = BigInt(originalAmount);
+  const slippageAsBP = BigInt(slippage * BASE_POINT);
+  const BIT = (slippageAsBP * originalAmount) / BigInt(BASE_POINT);
+  return originalAmount - BIT;
 }
