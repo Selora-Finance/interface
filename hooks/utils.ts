@@ -32,11 +32,18 @@ export function useWindowDimensions() {
   return windowDimensions;
 }
 
-export function useSetTimeout(cb: () => void, delay = DEFAULT_PROCESS_DURATION) {
+export function useSetTimeout(cb: () => void | Promise<void>, delay = DEFAULT_PROCESS_DURATION) {
   return useEffect(() => {
     const timeout = setTimeout(cb, delay);
     return () => clearTimeout(timeout);
   }, [cb, delay]);
+}
+
+export function useSetInterval(cb: () => void | Promise<void>, INTERVAL = DEFAULT_PROCESS_DURATION) {
+  return useEffect(() => {
+    const interval = setInterval(cb, INTERVAL);
+    return () => clearInterval(interval);
+  }, [INTERVAL, cb]);
 }
 
 export function useAtomicDate(delay: number = 1000) {

@@ -76,3 +76,22 @@ export function applySlippage(slippage: number, originalAmount: bigint | number)
   const BIT = (slippageAsBP * originalAmount) / BigInt(BASE_POINT);
   return originalAmount - BIT;
 }
+
+export function determinePriceImpact(
+  reserve0: string | number,
+  reserve1: string | number,
+  inputAmount: string | number,
+  expectedOutput: string | number,
+): number {
+  if (typeof reserve0 === 'string') reserve0 = parseFloat(reserve0);
+  if (typeof reserve1 === 'string') reserve1 = parseFloat(reserve1);
+  if (typeof inputAmount === 'string') inputAmount = parseFloat(inputAmount);
+  if (typeof expectedOutput === 'string') expectedOutput = parseFloat(expectedOutput);
+
+  if (isNaN(reserve0) || isNaN(reserve1) || isNaN(inputAmount) || isNaN(expectedOutput)) return 0;
+
+  const inputPerOutput = expectedOutput > 0 ? inputAmount / expectedOutput : 0;
+  const marketPrice = reserve1 > 0 ? reserve0 / reserve1 : 0;
+  const difference = inputPerOutput - marketPrice;
+  return marketPrice > 0 ? Math.abs(difference / marketPrice) * 100 : 0;
+}

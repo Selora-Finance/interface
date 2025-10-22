@@ -1,15 +1,16 @@
 'use client';
 
 import Image from 'next/image';
-import { Button, Card } from '@/components';
+import { Button, Card, Spinner } from '@/components';
 import { MAX_SCREEN_SIZES, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { AssetType } from '@/typings';
 import { useAtom } from 'jotai';
 import { ChevronDown, Settings } from 'lucide-react';
-import { useMemo } from 'react';
+import { useCallback, useMemo } from 'react';
 import { MdSwapVert } from 'react-icons/md';
 import { useWindowDimensions } from '@/hooks/utils';
+import { formatNumber } from '@/lib/client/utils';
 
 interface MainSwapViewProps {
   asset0?: AssetType | null;
@@ -18,6 +19,18 @@ interface MainSwapViewProps {
   onSelector1Click?: () => void;
   onSwitchClick?: () => void;
   onSettingsClick?: () => void;
+  onInitiateButtonClick?: () => void;
+  token0Balance?: number | string;
+  token1Balance?: number | string;
+  token0BalanceUSD?: number | string;
+  token1BalanceUSD?: number | string;
+  isLoading?: boolean;
+  needsApproval?: boolean;
+  onAmount0Change?: (value: string) => void;
+  onAmount1Change?: (value: string) => void;
+  amount0?: string;
+  amount1?: string;
+  currentPrice?: number;
 }
 
 const MainSwapView: React.FC<MainSwapViewProps> = ({
@@ -27,11 +40,50 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
   onSelector1Click,
   onSwitchClick,
   onSettingsClick,
+  onInitiateButtonClick,
+  token0Balance = 0,
+  token1Balance = 0,
+  token0BalanceUSD = 0,
+  token1BalanceUSD = 0,
+  isLoading = false,
+  needsApproval,
+  onAmount0Change,
+  onAmount1Change,
+  amount0,
+  amount1,
+  currentPrice = 0,
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
+
+  const handleInput0Change = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Change input value
+      onAmount0Change?.(e.target.value);
+      // Value as number
+      const valueAsNumber = parseFloat(e.target.value);
+      if (!isNaN(valueAsNumber)) {
+        onAmount1Change?.((valueAsNumber * currentPrice).toFixed(6));
+      }
+    },
+    [currentPrice, onAmount0Change, onAmount1Change],
+  );
+
+  const handleInput1Change = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      // Change input value
+      onAmount1Change?.(e.target.value);
+      // Value as number
+      const valueAsNumber = parseFloat(e.target.value);
+      if (!isNaN(valueAsNumber) && currentPrice !== 0) {
+        onAmount0Change?.((valueAsNumber / currentPrice).toFixed(6));
+      }
+    },
+    [currentPrice, onAmount0Change, onAmount1Change],
+  );
+
   return (
     <div className="flex justify-center items-center w-full md:w-1/4">
       <Card
@@ -50,7 +102,10 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
               >
                 <Settings />
               </button>
-              <span className="text-sm text-gray-500">0.0 {asset0?.symbol || 'Token0'}</span>
+              <span className="text-sm text-gray-500">
+                {' '}
+                {formatNumber(token0Balance)} {asset0?.symbol || 'Token0'}
+              </span>
             </div>
             <div className="border border-[#333333] w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2">
               <Button
@@ -76,11 +131,19 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
               </Button>
               <input
                 type="number"
+                onChange={handleInput0Change}
+                value={amount0}
                 className={`flex-1 bg-transparent text-right outline-0 ${
                   isDarkMode ? 'text-white' : 'text-[#000]'
                 } no-spinner text-xs md:text-lg`}
                 placeholder="0.0"
               />
+            </div>
+            <div className="flex justify-end items-center">
+              <span className="text-sm text-gray-500">
+                {' '}
+                {formatNumber(token0BalanceUSD, undefined, undefined, true)}
+              </span>
             </div>
           </div>
           {/* Divider line */}
@@ -99,7 +162,9 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
           <div className="flex flex-col justify-start items-center gap-4 w-full">
             <div className="flex justify-between items-center w-full">
               <span className="text-sm">Buy</span>
-              <span className="text-sm text-gray-500">0.0 {asset1?.symbol || 'Token1'}</span>
+              <span className="text-sm text-gray-500">
+                {formatNumber(token1Balance)} {asset1?.symbol || 'Token1'}
+              </span>
             </div>
             <div className="border border-[#333333] w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2">
               <Button
@@ -124,15 +189,29 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
                 )}
               </Button>
               <input
+                onChange={handleInput1Change}
+                value={amount1}
                 className={`flex-1 bg-transparent text-right outline-0 ${
                   isDarkMode ? 'text-white' : 'text-[#000]'
                 } no-spinner text-xs md:text-lg`}
                 placeholder="0.0"
               />
             </div>
+            <div className="flex justify-end items-center">
+              <span className="text-sm text-gray-500">
+                {' '}
+                {formatNumber(token1BalanceUSD, undefined, undefined, true)}
+              </span>
+            </div>
           </div>
-          <Button variant="primary" className="w-full py-5">
-            Swap
+          <Button
+            disabled={isLoading}
+            variant="primary"
+            className="w-full py-5 gap-2 flex justify-center items-center"
+            onClick={onInitiateButtonClick}
+          >
+            {needsApproval ? `Approve to spend ${asset0?.symbol}` : 'Swap'}
+            {isLoading && <Spinner size="sm" />}
           </Button>
         </div>
       </Card>

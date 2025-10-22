@@ -1,4 +1,6 @@
-import abi from '@/assets/abi/autoSwapExecutor'; // Signature is the same, so use one abi
+import autoSwapAbi from '@/assets/abi/autoSwapExecutor';
+import v2SwapAbi from '@/assets/abi/v2SwapExecutor';
+import v3SwapAbi from '@/assets/abi/v3SwapExecutor';
 import { AUTO_SWAP_EXECUTORS, ETHER, RouterType, V2_SWAP_EXECUTORS, V3_SWAP_EXECUTORS, WETH } from '@/constants';
 import { routerTypeAtom } from '@/store';
 import { useAtom } from 'jotai';
@@ -34,7 +36,7 @@ function usePredictSwapMovement(
   }, [chainId, routerType]);
 
   const { data, isFetching } = useReadContract({
-    abi,
+    abi: routerType === RouterType.AUTO ? autoSwapAbi : routerType === RouterType.V2 ? v2SwapAbi : v3SwapAbi,
     functionName: 'findBestRoute',
     args: [t0, t1, amountIn],
     address: routerAddress,
