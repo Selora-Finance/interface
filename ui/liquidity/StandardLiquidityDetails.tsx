@@ -21,7 +21,6 @@ const StandardLiquidityDetails: React.FC<StandardLiquidityDetailsProps> = ({
   asset1,
   amount0 = '0',
   amount1 = '0',
-  poolType = 'volatile',
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);

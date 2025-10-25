@@ -41,6 +41,10 @@ export function useSetTimeout(cb: () => void | Promise<void>, delay = DEFAULT_PR
 
 export function useSetInterval(cb: () => void | Promise<void>, INTERVAL = DEFAULT_PROCESS_DURATION) {
   return useEffect(() => {
+    // Invoke callback, then set interval
+    Promise.resolve(cb()).then(() => {
+      console.info('useSetInterval callback invoked');
+    });
     const interval = setInterval(cb, INTERVAL);
     return () => clearInterval(interval);
   }, [INTERVAL, cb]);

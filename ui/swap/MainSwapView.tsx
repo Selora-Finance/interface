@@ -49,14 +49,18 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
   needsApproval,
   onAmount0Change,
   onAmount1Change,
-  amount0,
-  amount1,
+  amount0 = '0',
+  amount1 = '0',
   currentPrice = 0,
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
+
+  const balanceIsSufficient = useMemo(() => {
+    return Number(token0Balance) >= Number(amount0);
+  }, [amount0, token0Balance]);
 
   const handleInput0Change = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -205,12 +209,23 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
             </div>
           </div>
           <Button
-            disabled={isLoading}
+            disabled={
+              isLoading ||
+              amount0.trim().length === 0 ||
+              amount1.trim().length === 0 ||
+              parseFloat(amount0) === 0 ||
+              parseFloat(amount1) === 0 ||
+              !balanceIsSufficient
+            }
             variant="primary"
             className="w-full py-5 gap-2 flex justify-center items-center"
             onClick={onInitiateButtonClick}
           >
-            {needsApproval ? `Approve to spend ${asset0?.symbol}` : 'Swap'}
+            {balanceIsSufficient ? (
+              <>{needsApproval ? `Approve to spend ${asset0?.symbol}` : 'Swap'}</>
+            ) : (
+              'Insufficient Balance'
+            )}
             {isLoading && <Spinner size="sm" />}
           </Button>
         </div>

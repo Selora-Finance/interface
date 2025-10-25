@@ -1,5 +1,5 @@
 import abi from '@/assets/abi/erc20';
-import { DEFAULT_PROCESS_DURATION, ETHER } from '@/constants';
+import { BI_ZERO, DEFAULT_PROCESS_DURATION, ETHER } from '@/constants';
 import { useState } from 'react';
 import { Address, maxUint256, zeroAddress } from 'viem';
 import { useAccount, usePublicClient } from 'wagmi';
@@ -10,13 +10,13 @@ function useGetAllowance(
   spender: Address = zeroAddress,
   refetchInterval: number = DEFAULT_PROCESS_DURATION,
 ) {
-  const [balance, setBalance] = useState<bigint>(BigInt(0));
+  const [balance, setBalance] = useState<bigint>(BI_ZERO);
   const { address = zeroAddress } = useAccount();
   const publicClient = usePublicClient();
 
   useSetInterval(async () => {
     if (address === zeroAddress) {
-      setBalance(BigInt(0));
+      setBalance(BI_ZERO);
       return;
     }
     if (token === zeroAddress || token.toLowerCase() === ETHER.toLowerCase()) {
@@ -34,7 +34,7 @@ function useGetAllowance(
       });
       setBalance(callResult);
     } catch (error: unknown) {
-      setBalance(BigInt(0));
+      setBalance(BI_ZERO);
       console.error(error);
     }
   }, refetchInterval);

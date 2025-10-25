@@ -1,4 +1,4 @@
-import { DEFAULT_PROCESS_DURATION, ETHER } from '@/constants';
+import { BI_ZERO, DEFAULT_PROCESS_DURATION, ETHER } from '@/constants';
 import abi from '@/assets/abi/erc20';
 import { useState } from 'react';
 import { Address, zeroAddress } from 'viem';
@@ -6,23 +6,23 @@ import { useSetInterval } from './utils';
 import { useAccount, usePublicClient } from 'wagmi';
 
 function useGetBalance(token: Address = ETHER, refetchInterval: number = DEFAULT_PROCESS_DURATION) {
-  const [balance, setBalance] = useState<bigint>(BigInt(0));
+  const [balance, setBalance] = useState<bigint>(BI_ZERO);
   const { address = zeroAddress } = useAccount();
   const publicClient = usePublicClient();
 
   useSetInterval(async () => {
     if (address === zeroAddress) {
-      setBalance(BigInt(0));
+      setBalance(BI_ZERO);
       return;
     }
 
     if (token === zeroAddress) {
-      setBalance(BigInt(0));
+      setBalance(BI_ZERO);
       return;
     }
 
     if (!publicClient) {
-      setBalance(BigInt(0));
+      setBalance(BI_ZERO);
       return;
     }
     try {
@@ -39,7 +39,7 @@ function useGetBalance(token: Address = ETHER, refetchInterval: number = DEFAULT
         setBalance(callResult);
       }
     } catch (error: unknown) {
-      setBalance(BigInt(0));
+      setBalance(BI_ZERO);
       console.error(error);
     }
   }, refetchInterval);

@@ -24,6 +24,9 @@ export const BASE_POINT = 1000;
 export const MIN_IN_SEC = 3600;
 export const REFETCH_INTERVALS = 10000;
 
+// Bigints
+export const BI_ZERO = BigInt(0);
+
 // Chain parameters
 export const ETHER = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE';
 export const V2_ROUTERS: { [key: number]: `0x${string}` } = {
@@ -52,4 +55,7 @@ export const V3_FACTORY: { [key: number]: `0x${string}` } = {
 };
 export const ORACLE: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x4186F4901Ac2ED69a137bd6eC9187E0b4601d3C2',
+};
+export const EXPLORERS: { [key: number]: string } = {
+  [Chains.FLUENT_TESTNET]: 'https://testnet.fluentscan.xyz',
 };
