@@ -36,13 +36,13 @@ export const NFPM: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x24e95fe9fF4D4F988911cfd9A5D9443b3E640C22',
 };
 export const AUTO_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0x0ABEA33A4f7086FEf12BE2EbBA9d89a8e9C14E5f',
+  [Chains.FLUENT_TESTNET]: '0x037A4493CC949Ad4f9dbf8CcAeF558B6DEd26218',
 };
 export const V2_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0x94d52E8A61F0eC8C5FeD61A3bD0e7d12ab430604',
+  [Chains.FLUENT_TESTNET]: '0x57953bB66b17032DeA780e7e078bc887F6Bae9Bc',
 };
 export const V3_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0xd3Af06BC35158140aAD1A26106bb18F5f758a39b',
+  [Chains.FLUENT_TESTNET]: '0xcaBcFED4a3F7420B11133D31fF79A57353234D91',
 };
 export const WETH: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x3d38E57b5d23c3881AffB8BC0978d5E0bd96c1C6',

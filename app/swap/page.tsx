@@ -1,6 +1,14 @@
 'use client';
 
-import { AUTO_SWAP_EXECUTORS, REFETCH_INTERVALS, RouterType, V2_SWAP_EXECUTORS, V3_SWAP_EXECUTORS } from '@/constants';
+import {
+  AUTO_SWAP_EXECUTORS,
+  BI_ZERO,
+  EXPLORERS,
+  REFETCH_INTERVALS,
+  RouterType,
+  V2_SWAP_EXECUTORS,
+  V3_SWAP_EXECUTORS,
+} from '@/constants';
 import { useAssetList } from '@/context/assets';
 import useAutoSwap from '@/hooks/swap/useAutoSwap';
 import usePredictSwapMovement from '@/hooks/swap/usePredictSwapMovement';
@@ -16,6 +24,8 @@ import AssetListModal from '@/ui/AssetListModal';
 import SettingsModal from '@/ui/SettingsModal';
 import MainSwapView from '@/ui/swap/MainSwapView';
 import SwapDetails from '@/ui/swap/SwapDetails';
+import TransactionErrorModal from '@/ui/TransactionErrorModal';
+import TransactionSuccessModal from '@/ui/TransactionSuccessModal';
 import { useAtom } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
 import { Address, formatUnits, getAddress, parseUnits, zeroAddress } from 'viem';
@@ -37,6 +47,10 @@ export default function Swap() {
   const [showModal0, setShowModal0] = useState<boolean>(false);
   const [showModal1, setShowModal1] = useState<boolean>(false);
   const [showSettings, setShowSettings] = useState<boolean>(false);
+  // Transaction modals parameters
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
+  const [transactionPreviewUrl, setTransactionPreviewUrl] = useState<string>('');
   // Selected router type
   const [routerType] = useAtom(routerTypeAtom);
   const [slippage] = useAtom(slippageToleranceAtom);
@@ -106,14 +120,14 @@ export default function Swap() {
   const formattedUnitQuote = useMemo(
     () =>
       Number(
-        formatUnits(unitSwapQuote.data[unitSwapQuote.data.length - 1].amountOut || BigInt(0), asset1?.decimals ?? 18),
+        formatUnits(unitSwapQuote.data[unitSwapQuote.data.length - 1]?.amountOut || BI_ZERO, asset1?.decimals ?? 18),
       ),
     [asset1?.decimals, unitSwapQuote.data],
   );
 
   // Min received
   const minReceived = useMemo(
-    () => applySlippage(slippage, swapQuote.data[swapQuote.data.length - 1].amountOut || BigInt(0)),
+    () => applySlippage(slippage, swapQuote.data[swapQuote.data.length - 1]?.amountOut || BI_ZERO),
     [slippage, swapQuote.data],
   );
 
@@ -122,19 +136,34 @@ export default function Swap() {
     address0,
     address1,
     parseUnits(amount0, asset0?.decimals ?? 18),
-    swapQuote.data[swapQuote.data.length - 1].amountOut || BigInt(0),
+    swapQuote.data[swapQuote.data.length - 1]?.amountOut || BI_ZERO,
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
   );
   const v2Swap = useV2Swap(
     address0,
     address1,
     parseUnits(amount0, asset0?.decimals ?? 18),
-    swapQuote.data[swapQuote.data.length - 1].amountOut || BigInt(0),
+    swapQuote.data[swapQuote.data.length - 1]?.amountOut || BI_ZERO,
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
   );
   const v3Swap = useV3Swap(
     address0,
     address1,
     parseUnits(amount0, asset0?.decimals ?? 18),
-    swapQuote.data[swapQuote.data.length - 1].amountOut || BigInt(0),
+    swapQuote.data[swapQuote.data.length - 1]?.amountOut || BI_ZERO,
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
   );
 
   const initiateProcess = useCallback(() => {
@@ -187,6 +216,14 @@ export default function Swap() {
           amount0={amount0}
           amount1={amount1}
           currentPrice={formattedUnitQuote}
+          isLoading={
+            autoSwap.isLoading ||
+            v2Swap.isLoading ||
+            v3Swap.isLoading ||
+            v2SwapperApproval.isLoading ||
+            v3SwapperApproval.isLoading ||
+            autoSwapperApproval.isLoading
+          }
         />
         <SwapDetails
           asset0={asset0}
@@ -214,6 +251,33 @@ export default function Swap() {
         onClose={() => setShowModal1(false)}
       />
       <SettingsModal show={showSettings} onHide={() => setShowSettings(false)} />
+      <TransactionSuccessModal
+        title="Swap"
+        onHide={() => {
+          v2SwapperApproval.reset();
+          v3SwapperApproval.reset();
+          autoSwapperApproval.reset();
+          autoSwap.reset();
+          v2Swap.reset();
+          v3Swap.reset();
+          setShowSuccess(false);
+        }}
+        show={showSuccess}
+        transactionPreviewUrl={transactionPreviewUrl}
+      />
+      <TransactionErrorModal
+        title="Swap"
+        onHide={() => {
+          v2SwapperApproval.reset();
+          v3SwapperApproval.reset();
+          autoSwapperApproval.reset();
+          autoSwap.reset();
+          v2Swap.reset();
+          v3Swap.reset();
+          setShowError(false);
+        }}
+        show={showError}
+      />
     </>
   );
 }

@@ -12,6 +12,30 @@ export function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
 }
 
+function replaceZerosWithSubscript(str: string) {
+  return str.replace(/0{4,}/g, match => {
+    const count = match.length;
+    const subscriptDigits: { [key: string]: string } = {
+      '0': '₀',
+      '1': '₁',
+      '2': '₂',
+      '3': '₃',
+      '4': '₄',
+      '5': '₅',
+      '6': '₆',
+      '7': '₇',
+      '8': '₈',
+      '9': '₉',
+    };
+    const subscriptCount = count
+      .toString()
+      .split('')
+      .map(d => subscriptDigits[d])
+      .join('');
+    return `0${subscriptCount}`;
+  });
+}
+
 export function formatNumber(
   num: number | string,
   locales: Intl.LocalesArgument = 'en-US',
@@ -24,15 +48,17 @@ export function formatNumber(
 
   opts.trailingZeroDisplay = 'stripIfInteger';
   opts.maximumFractionDigits = maximumFracts;
+  opts.maximumSignificantDigits = 6;
   opts.notation = 'compact';
   opts.compactDisplay = 'short';
+  opts.useGrouping = true;
 
   if (inUSD) {
     opts.style = 'currency';
     opts.currency = 'USD';
   }
 
-  return new Intl.NumberFormat(locales, opts).format(num);
+  return replaceZerosWithSubscript(new Intl.NumberFormat(locales, opts).format(num));
 }
 
 export function mapGQLPool(gqlPools: Pool[], assetLookupFunction?: (id?: string) => AssetType | undefined): PoolData[] {
@@ -47,11 +73,13 @@ export function mapGQLPool(gqlPools: Pool[], assetLookupFunction?: (id?: string)
         symbol: pool.token0?.symbol as string,
         logoURI: asset0?.logoURI || '',
         amount: formatNumber(pool.volumeToken0 as string, undefined, 4),
+        id: pool.token0.id,
       },
       token1: {
         symbol: pool.token1?.symbol as string,
         logoURI: asset1?.logoURI || '',
         amount: formatNumber(pool.volumeToken1 as string, undefined, 4),
+        id: pool.token1.id,
       },
       fees: formatNumber(pool.totalFeesUSD as string, undefined, 4, true),
       feeAmounts: {

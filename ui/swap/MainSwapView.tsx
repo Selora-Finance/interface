@@ -143,7 +143,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
                 placeholder="0.0"
               />
             </div>
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center w-full">
               <span className="text-sm text-gray-500">
                 {' '}
                 {formatNumber(token0BalanceUSD, undefined, undefined, true)}
@@ -201,7 +201,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
                 placeholder="0.0"
               />
             </div>
-            <div className="flex justify-end items-center">
+            <div className="flex justify-end items-center w-full">
               <span className="text-sm text-gray-500">
                 {' '}
                 {formatNumber(token1BalanceUSD, undefined, undefined, true)}
@@ -209,14 +209,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
             </div>
           </div>
           <Button
-            disabled={
-              isLoading ||
-              amount0.trim().length === 0 ||
-              amount1.trim().length === 0 ||
-              parseFloat(amount0) === 0 ||
-              parseFloat(amount1) === 0 ||
-              !balanceIsSufficient
-            }
+            disabled={isLoading || amount0.trim().length === 0 || parseFloat(amount0) === 0 || !balanceIsSufficient}
             variant="primary"
             className="w-full py-5 gap-2 flex justify-center items-center"
             onClick={onInitiateButtonClick}

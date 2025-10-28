@@ -31,8 +31,8 @@ function useApproveSpend(
 ) {
   const composition = useMemo(() => composeBytes(spender, amount), [amount, spender]);
 
-  const { sendTransaction, data: hash, error: sendError, reset } = useSendTransaction();
-  const { error: waitError, isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { sendTransaction, data: hash, error: sendError, reset, isPending } = useSendTransaction();
+  const { error: waitError, isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   const execute = useCallback(() => {
     if (token !== zeroAddress && token.toLowerCase() !== ETHER.toLowerCase())
@@ -49,7 +49,7 @@ function useApproveSpend(
     if ((sendError || waitError) && onError) onError((sendError ?? waitError) as any);
   }, [hash, isSuccess, onError, onSuccess, sendError, waitError]);
 
-  return { execute, reset, isLoading };
+  return { execute, reset, isLoading: isLoading || isPending };
 }
 
 export default useApproveSpend;

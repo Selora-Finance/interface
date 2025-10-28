@@ -123,7 +123,7 @@ function useAddLiquidityV3(
     sqrtPriceX96,
   );
 
-  const { sendTransaction, data: hash, error: sendError, reset } = useSendTransaction();
+  const { sendTransaction, data: hash, error: sendError, reset, isPending } = useSendTransaction();
   const { error: waitError, isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
 
   const execute = useCallback(
@@ -142,7 +142,7 @@ function useAddLiquidityV3(
     if ((sendError || waitError) && onError) onError((sendError ?? waitError) as any);
   }, [hash, isSuccess, onError, onSuccess, sendError, waitError]);
 
-  return { execute, reset, isLoading };
+  return { execute, reset, isLoading: isLoading || isPending };
 }
 
 export default useAddLiquidityV3;

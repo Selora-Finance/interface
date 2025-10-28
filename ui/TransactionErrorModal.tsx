@@ -5,7 +5,7 @@ import { DEFAULT_PROCESS_DURATION, Themes } from '@/constants';
 import { useSetTimeout } from '@/hooks/utils';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
-import { X, XCircle } from 'lucide-react';
+import { CircleAlert, X } from 'lucide-react';
 import { useMemo } from 'react';
 
 interface TransactionErrorModalProps {
@@ -45,7 +45,7 @@ const TransactionErrorModal: React.FC<TransactionErrorModalProps> = ({
           </button>
         </div>
         <div className="flex w-full flex-col justify-center items-center gap-3">
-          <XCircle size={50} />
+          <CircleAlert size={100} color="red" />
           <span className="text-lg md:text-xl text-center font-semibold">Transaction Failed</span>
           <span className="text-sm md:text-lg text-center font-light">Your transaction could not be completed</span>
         </div>

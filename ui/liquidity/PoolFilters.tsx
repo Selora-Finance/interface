@@ -47,10 +47,11 @@ const PoolFilters: React.FC<PoolFiltersProps> = ({ activeFilter, onFilterChange,
 
       {/* Type Filters with Create Button */}
       {filters.map(filter => (
-        <button
+        <div
+          role="button"
           key={filter.type}
           onClick={() => onFilterChange(filter.type)}
-          className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg border transition-all ${
+          className={`flex items-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-lg border transition-all cursor-pointer ${
             activeFilter === filter.type
               ? isDarkMode
                 ? 'bg-[#333333] border-[#d0de27] text-white'
@@ -70,7 +71,7 @@ const PoolFilters: React.FC<PoolFiltersProps> = ({ activeFilter, onFilterChange,
           >
             <Plus size={isMobile ? 12 : 16} />
           </button>
-        </button>
+        </div>
       ))}
     </div>
   );

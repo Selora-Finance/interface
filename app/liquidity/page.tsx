@@ -33,7 +33,7 @@ export default function Liquidity() {
   // Stats (fetched every minute)
   const stats = useStats(60000);
   // Pools (from subgraph, fetched every minute)
-  const qlPools = useAllPools(0, 2000, 60000);
+  const qlPools = useAllPools(0, 1000, 60000);
 
   // Function to find asset
   const lookupAsset = useCallback(
@@ -81,10 +81,19 @@ export default function Liquidity() {
     return filteredPools.slice(startIndex, endIndex);
   }, [filteredPools, currentPage]);
 
-  const handleDeposit = (poolId: string) => {
-    console.log('Deposit to pool:', poolId);
-    router.push('/liquidity/deposit');
-  };
+  const handleDeposit = useCallback(
+    (poolId: string) => {
+      const matchingPool = mappedPools.find(pool => pool.id.toLowerCase() === poolId.toLowerCase());
+      if (!matchingPool) return;
+
+      if (matchingPool.type !== 'concentrated') {
+        router.push(
+          `/liquidity/deposit/standard?token0=${matchingPool.token0.id}&token1=${matchingPool.token1.id}&poolType=${matchingPool.type}`,
+        );
+      }
+    },
+    [mappedPools, router],
+  );
 
   const handleDepositLiquidity = () => {
     router.push('/liquidity/deposit');

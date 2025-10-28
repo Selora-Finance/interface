@@ -54,11 +54,13 @@ export interface PoolData {
     symbol: string;
     logoURI: string;
     amount?: string;
+    id?: string;
   };
   token1: {
     symbol: string;
     logoURI: string;
     amount?: string;
+    id?: string;
   };
   tvl: string;
   volume: string;

@@ -73,8 +73,8 @@ function useV3Swap(
     [address, amountIn, amountOutMin, token0, token1, txDeadlineParsed],
   );
 
-  const { sendTransaction, data: hash, error: sendError, reset } = useSendTransaction();
-  const { error: waitError, isSuccess, isLoading } = useWaitForTransactionReceipt({ hash });
+  const { sendTransaction, data: hash, error: sendError, reset, isPending } = useSendTransaction();
+  const { error: waitError, isLoading, isSuccess } = useWaitForTransactionReceipt({ hash });
 
   const execute = useCallback(
     () =>
@@ -92,7 +92,7 @@ function useV3Swap(
     if ((sendError || waitError) && onError) onError((sendError ?? waitError) as any);
   }, [hash, isSuccess, onError, onSuccess, sendError, waitError]);
 
-  return { execute, reset, isLoading };
+  return { execute, reset, isLoading: isLoading || isPending };
 }
 
 export default useV3Swap;

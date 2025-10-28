@@ -7,6 +7,7 @@ import { AssetType } from '@/typings';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 import { useWindowDimensions } from '@/hooks/utils';
+import { formatNumber } from '@/lib/client/utils';
 
 interface StandardLiquidityDetailsProps {
   asset0?: AssetType | null;
@@ -14,6 +15,8 @@ interface StandardLiquidityDetailsProps {
   amount0?: string;
   amount1?: string;
   poolType?: 'volatile' | 'stable';
+  allowance0?: string;
+  allowance1?: string;
 }
 
 const StandardLiquidityDetails: React.FC<StandardLiquidityDetailsProps> = ({
@@ -21,6 +24,8 @@ const StandardLiquidityDetails: React.FC<StandardLiquidityDetailsProps> = ({
   asset1,
   amount0 = '0',
   amount1 = '0',
+  allowance0 = '0',
+  allowance1 = '0',
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
@@ -60,11 +65,11 @@ const StandardLiquidityDetails: React.FC<StandardLiquidityDetailsProps> = ({
             <div className="flex flex-col gap-3">
               <div className="w-full justify-between items-center flex gap-3">
                 <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{asset0?.symbol || 'Token'} Allowance:</span>
-                <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>0.000</span>
+                <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{formatNumber(allowance0)}</span>
               </div>
               <div className="w-full justify-between items-center flex gap-3">
                 <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{asset1?.symbol || 'Token'} Allowance:</span>
-                <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>0.000</span>
+                <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{formatNumber(allowance1)}</span>
               </div>
             </div>
           </div>

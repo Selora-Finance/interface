@@ -47,7 +47,7 @@ const TransactionSuccessModal: React.FC<TransactionSuccessModalProps> = ({
           </button>
         </div>
         <div className="flex w-full flex-col justify-center items-center gap-3">
-          <CheckCircle2 size={50} />
+          <CheckCircle2 size={100} color="#d0de27" />
           <span className="text-lg md:text-xl text-center font-semibold">Transaction Processed</span>
           <span className="text-sm md:text-lg text-center font-light">Your transaction has been processed!</span>
         </div>

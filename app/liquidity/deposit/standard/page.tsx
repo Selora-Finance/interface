@@ -38,8 +38,8 @@ export default function StandardLiquidity() {
     return data;
   }, [searchParams]);
 
-  const [address0, setAddress0] = useState<Address>(getAddress(queryParams.token0));
-  const [address1, setAddress1] = useState<Address>(getAddress(queryParams.token1));
+  const [address0, setAddress0] = useState<Address>(zeroAddress);
+  const [address1, setAddress1] = useState<Address>(zeroAddress);
 
   const [showModal0, setShowModal0] = useState<boolean>(false);
   const [showModal1, setShowModal1] = useState<boolean>(false);
@@ -63,7 +63,10 @@ export default function StandardLiquidity() {
   // Assets list
   const assets = useAssetList();
   const [asset0, asset1] = useMemo(() => {
-    return [assets.find(asset => asset.address === address0), assets.find(asset => asset.address === address1)];
+    return [
+      assets.find(asset => asset.address.toLowerCase() === address0.toLowerCase()),
+      assets.find(asset => asset.address.toLowerCase() === address1.toLowerCase()),
+    ];
   }, [assets, address0, address1]);
 
   const handleBackClick = () => {
@@ -103,29 +106,11 @@ export default function StandardLiquidity() {
 
   // Allowances
   const token0RouterAllowance = useGetAllowance(address0, v2Router, REFETCH_INTERVALS);
-  const token1RouterAllowance = useGetAllowance(address0, v2Router, REFETCH_INTERVALS);
+  const token1RouterAllowance = useGetAllowance(address1, v2Router, REFETCH_INTERVALS);
 
   // Approvals
-  const token0RouterApproval = useApproveSpend(
-    address0,
-    v2Router,
-    amount0Parsed,
-    hash => {
-      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
-      setShowSuccess(true);
-    },
-    () => setShowError(true),
-  );
-  const token1RouterApproval = useApproveSpend(
-    address0,
-    v2Router,
-    amount1Parsed,
-    hash => {
-      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
-      setShowSuccess(true);
-    },
-    () => setShowError(true),
-  );
+  const token0RouterApproval = useApproveSpend(address0, v2Router, amount0Parsed);
+  const token1RouterApproval = useApproveSpend(address1, v2Router, amount1Parsed);
 
   // Add liquidity
   const addLiquidity = useAddLiquidityV2(
@@ -143,8 +128,16 @@ export default function StandardLiquidity() {
 
   // Initiate transaction
   const initiateTransaction = useCallback(() => {
-    if (token0RouterAllowance < amount0Parsed) return token0RouterApproval.execute();
-    if (token1RouterAllowance < amount1Parsed) return token1RouterApproval.execute();
+    if (token0RouterAllowance < amount0Parsed) {
+      token0RouterApproval.reset();
+      return token0RouterApproval.execute();
+    }
+    if (token1RouterAllowance < amount1Parsed) {
+      token1RouterApproval.reset();
+      return token1RouterApproval.execute();
+    }
+
+    addLiquidity.reset();
     return addLiquidity.execute();
   }, [
     addLiquidity,
@@ -166,11 +159,11 @@ export default function StandardLiquidity() {
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => handleQueryParamsChange(), [handleQueryParamsChange]);
-  useEffect(() => {
-    token0RouterApproval.reset();
-    token1RouterApproval.reset();
-    addLiquidity.reset();
-  }, [addLiquidity, token0RouterApproval, token1RouterApproval, transactionPreviewUrl]);
+  // useEffect(() => {
+  //   token0RouterApproval.reset();
+  //   token1RouterApproval.reset();
+  //   addLiquidity.reset();
+  // }, [addLiquidity, token0RouterApproval, token1RouterApproval, transactionPreviewUrl]);
 
   return (
     <>
@@ -205,6 +198,8 @@ export default function StandardLiquidity() {
           amount0={amount0}
           amount1={amount1}
           poolType={poolType}
+          allowance0={formatUnits(token0RouterAllowance, asset0?.decimals ?? 18)}
+          allowance1={formatUnits(token1RouterAllowance, asset1?.decimals ?? 18)}
         />
       </div>
       <AssetListModal
@@ -228,11 +223,25 @@ export default function StandardLiquidity() {
       <SettingsModal show={showSettings} onHide={() => setShowSettings(false)} />
       <TransactionSuccessModal
         title="Add Liquidity"
-        onHide={() => setShowSuccess(false)}
+        onHide={() => {
+          setShowSuccess(false);
+          token0RouterApproval.reset();
+          token1RouterApproval.reset();
+          addLiquidity.reset();
+        }}
         show={showSuccess}
         transactionPreviewUrl={transactionPreviewUrl}
       />
-      <TransactionErrorModal title="Add Liquidity" onHide={() => setShowError(false)} show={showError} />
+      <TransactionErrorModal
+        title="Add Liquidity"
+        onHide={() => {
+          token0RouterApproval.reset();
+          token1RouterApproval.reset();
+          addLiquidity.reset();
+          setShowError(false);
+        }}
+        show={showError}
+      />
     </>
   );
 }

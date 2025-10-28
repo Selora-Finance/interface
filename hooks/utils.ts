@@ -1,5 +1,5 @@
 import { DEFAULT_PROCESS_DURATION } from '@/constants';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WindowDimensions {
   width?: number;
@@ -40,14 +40,24 @@ export function useSetTimeout(cb: () => void | Promise<void>, delay = DEFAULT_PR
 }
 
 export function useSetInterval(cb: () => void | Promise<void>, INTERVAL = DEFAULT_PROCESS_DURATION) {
-  return useEffect(() => {
-    // Invoke callback, then set interval
+  const savedCallback = useRef<() => void | Promise<void>>(null);
+
+  useEffect(() => {
+    savedCallback.current = cb;
     Promise.resolve(cb()).then(() => {
-      console.info('useSetInterval callback invoked');
+      console.info('useSetInterval callback [first invocation]');
     });
-    const interval = setInterval(cb, INTERVAL);
+  }, [cb]);
+  return useEffect(() => {
+    function caller() {
+      if (savedCallback.current)
+        Promise.resolve(savedCallback.current()).then(() => {
+          console.info('useSetInterval callback invoked');
+        });
+    }
+    const interval = setInterval(caller, INTERVAL);
     return () => clearInterval(interval);
-  }, [INTERVAL, cb]);
+  }, [INTERVAL]);
 }
 
 export function useAtomicDate(delay: number = 1000) {
