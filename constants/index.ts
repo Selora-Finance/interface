@@ -21,8 +21,11 @@ export enum Chains {
 
 export const DEFAULT_PROCESS_DURATION = 5000;
 export const BASE_POINT = 1000;
+export const LARGE_BASE_POINT = 10000;
 export const MIN_IN_SEC = 3600;
 export const REFETCH_INTERVALS = 10000;
+export const V3_SQRT_PRICE_BASIS = BigInt(Math.pow(2, 96));
+export const V3_TICK_BASIS = 1.0001;
 
 // Bigints
 export const BI_ZERO = BigInt(0);

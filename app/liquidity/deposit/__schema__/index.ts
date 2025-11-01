@@ -1,3 +1,4 @@
+import { BI_ZERO } from '@/constants';
 import { isAddress, zeroAddress } from 'viem';
 import * as zod from 'zod';
 
@@ -17,7 +18,7 @@ export const StandardLiquidityQuerySchema = zod.object({
 
 export const ConcentratedLiquidityQuerySchema = StandardLiquidityQuerySchema.omit({ poolType: true }).extend({
   tickSpacing: zod.coerce.number().optional(),
-  tokenId: zod.coerce.bigint().optional(),
+  tokenId: zod.coerce.bigint().optional().default(BI_ZERO),
 });
 
 export type StandardLiquidityQueryType = zod.infer<typeof StandardLiquidityQuerySchema>;

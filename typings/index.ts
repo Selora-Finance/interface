@@ -78,4 +78,5 @@ export interface PoolData {
     token0: string;
     token1: string;
   };
+  tickSpacing?: number | null;
 }

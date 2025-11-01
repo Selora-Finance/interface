@@ -90,6 +90,10 @@ export default function Liquidity() {
         router.push(
           `/liquidity/deposit/standard?token0=${matchingPool.token0.id}&token1=${matchingPool.token1.id}&poolType=${matchingPool.type}`,
         );
+      } else {
+        router.push(
+          `/liquidity/deposit/concentrated?token0=${matchingPool.token0.id}&token1=${matchingPool.token1.id}&poolType=${matchingPool.type}&tickSpacing=${matchingPool.tickSpacing}`,
+        );
       }
     },
     [mappedPools, router],

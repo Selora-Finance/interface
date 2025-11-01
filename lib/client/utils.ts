@@ -12,6 +12,11 @@ export function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
 }
 
+export function isValidNonZeroNumberString(numberString: string) {
+  const valueAsNumber = Number(numberString);
+  return !isNaN(valueAsNumber) && valueAsNumber > 0;
+}
+
 function replaceZerosWithSubscript(str: string) {
   return str.replace(/0{4,}/g, match => {
     const count = match.length;
@@ -93,6 +98,7 @@ export function mapGQLPool(gqlPools: Pool[], assetLookupFunction?: (id?: string)
       type: pool.poolType?.toLowerCase() as 'concentrated' | 'stable' | 'volatile',
       apr: `${formatNumber(pool.gauge?.rewardRate || '0', undefined, 2)}%`,
       feeRate: '0%',
+      tickSpacing: pool.tickSpacing,
     };
     return data;
   });
