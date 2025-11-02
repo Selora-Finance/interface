@@ -30,7 +30,7 @@ const LiquidityHero: React.FC<LiquidityHeroProps> = ({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex flex-col gap-2 flex-1">
           <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-normal`}>
-            Liquidity Providers make low-slippage swaps possible. Deposit and Stake liquidity to earn TEOS.
+            Liquidity Providers make low-slippage swaps possible. Deposit and Stake liquidity to earn SELO.
           </h2>
           <p className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>
             There are currently{' '}

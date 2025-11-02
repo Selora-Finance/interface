@@ -1,6 +1,6 @@
 import { BASE_POINT } from '@/constants';
-import { Pool } from '@/gql/codegen/graphql';
-import { AssetType, PoolData } from '@/typings';
+import { LiquidityPosition, Pool } from '@/gql/codegen/graphql';
+import { AssetType, PoolData, PositionData } from '@/typings';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
 
@@ -99,6 +99,53 @@ export function mapGQLPool(gqlPools: Pool[], assetLookupFunction?: (id?: string)
       apr: `${formatNumber(pool.gauge?.rewardRate || '0', undefined, 2)}%`,
       feeRate: '0%',
       tickSpacing: pool.tickSpacing,
+    };
+    return data;
+  });
+}
+
+export function calculatePositionPercentage(position: string | number, totalSupply: string | number) {
+  if (typeof position === 'string') position = parseFloat(position);
+  if (typeof totalSupply === 'string') totalSupply = parseFloat(totalSupply);
+  return totalSupply > 0 ? position / totalSupply : 0;
+}
+
+export function mapGQLUserLiquidityPositions(
+  gqlPositions: LiquidityPosition[],
+  assetLookupFunction?: (id?: string) => AssetType | undefined,
+): PositionData[] {
+  return gqlPositions.map(position => {
+    const asset0 = assetLookupFunction?.(position.pool.token0?.id);
+    const asset1 = assetLookupFunction?.(position.pool.token1?.id);
+    const positionPercentage = calculatePositionPercentage(position.position, position.pool.totalSupply);
+    const token0Amount = positionPercentage * parseFloat(position.pool.reserve0);
+    const token1Amount = positionPercentage * parseFloat(position.pool.reserve1);
+    const positionUSD = positionPercentage * parseFloat(position.pool.reserveUSD);
+
+    const data: PositionData = {
+      id: position.id,
+      tvl: formatNumber(position.pool.reserveUSD as string, undefined, 4, true),
+      token0: {
+        symbol: position.pool.token0?.symbol as string,
+        logoURI: asset0?.logoURI || '',
+        amount: formatNumber(token0Amount, undefined, 4),
+        id: position.pool.token0.id,
+      },
+      token1: {
+        symbol: position.pool.token1?.symbol as string,
+        logoURI: asset1?.logoURI || '',
+        amount: formatNumber(token1Amount, undefined, 4),
+        id: position.pool.token1.id,
+      },
+      yourDeposit: formatNumber(positionUSD, undefined, 4, true),
+      poolTvl: {
+        token0: formatNumber(position.pool.reserve0),
+        token1: formatNumber(position.pool.reserve1),
+      },
+      staked: '0',
+      type: position.pool.poolType.toLowerCase() as 'concentrated' | 'stable' | 'volatile',
+      feeRate: '0',
+      apr: `${formatNumber(position.pool.gauge?.rewardRate || '0', undefined, 2)}%`,
     };
     return data;
   });

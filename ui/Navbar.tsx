@@ -42,16 +42,14 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
       } ${scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'}`}
     >
       {/* Logo */}
-      <div className="flex justify-center items-center gap-4">
-        <Link href="/">
-          <Logo className="w-10 h-10 rounded-full" />
-        </Link>
+      <Link href="/" className="flex justify-center items-center gap-4 cursor-pointer">
+        <Logo className="w-10 h-10 rounded-full" />
         <span
           className={`${scrolled || !isDarkMode ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}
         >
           Selora
         </span>
-      </div>
+      </Link>
 
       {/* Desktop Nav */}
       <div className="hidden md:flex gap-6 justify-center items-center">
@@ -82,7 +80,9 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
         >
           {isConnected ? formatAddress(address!) : 'Connect'}
         </Button> */}
-        <CustomConnectButton />
+        <div className="hidden md:block">
+          <CustomConnectButton />
+        </div>
       </div>
 
       {/* Mobile Menu Button + Connect */}

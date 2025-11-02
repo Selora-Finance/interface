@@ -1,21 +1,20 @@
 'use client';
 
 import { Button } from '@/components';
-import { MAX_SCREEN_SIZES, Themes } from '@/constants';
-import { themeAtom } from '@/store';
-import { useAtom } from 'jotai';
+import { MAX_SCREEN_SIZES } from '@/constants';
 import { useMemo } from 'react';
 import { ExternalLink } from 'lucide-react';
 import { useWindowDimensions } from '@/hooks/utils';
+import { formatNumber } from '@/lib/client/utils';
 
 interface PositionsHeroProps {
   totalPositions: number;
+  tvl?: number | string;
+  fees?: number | string;
   onNewDepositClick?: () => void;
 }
 
-const PositionsHero: React.FC<PositionsHeroProps> = ({ totalPositions, onNewDepositClick }) => {
-  const [theme] = useAtom(themeAtom);
-  const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
+const PositionsHero: React.FC<PositionsHeroProps> = ({ totalPositions, onNewDepositClick, tvl = 0, fees = 0 }) => {
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
 
@@ -25,7 +24,7 @@ const PositionsHero: React.FC<PositionsHeroProps> = ({ totalPositions, onNewDepo
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex flex-col gap-2 flex-1">
           <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-normal`}>
-            Liquidity Providers make low-slippage swaps possible. Deposit and Stake liquidity to earn CEDA.
+            Liquidity Providers make low-slippage swaps possible. Deposit and Stake liquidity to earn SELO.
           </h2>
           <p className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>
             You currently have <span className="text-[#d0de27] font-semibold">{totalPositions} Liquidity</span>
@@ -38,11 +37,15 @@ const PositionsHero: React.FC<PositionsHeroProps> = ({ totalPositions, onNewDepo
         <div className="flex flex-wrap gap-6 md:gap-10 items-center">
           <div className="flex flex-col gap-2">
             <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Your TVL Deposited</span>
-            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>~$680.52</span>
+            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>
+              ~{formatNumber(tvl, undefined, 4, true)}
+            </span>
           </div>
           <div className="flex flex-col gap-2">
             <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Your Fees Earned</span>
-            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>~$401.32</span>
+            <span className={`${isMobile ? 'text-xl' : 'text-2xl'} font-bold`}>
+              ~{formatNumber(fees, undefined, 4, true)}
+            </span>
           </div>
         </div>
 

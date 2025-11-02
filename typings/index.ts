@@ -28,18 +28,20 @@ export interface PositionData {
     symbol: string;
     logoURI: string;
     amount?: string;
+    id?: string;
   };
   token1: {
     symbol: string;
     logoURI: string;
     amount?: string;
+    id?: string;
   };
   tvl: string;
   apr: string;
   yourDeposit: string;
   staked: string;
   feeRate: string;
-  type: 'basic' | 'concentrated' | 'stable' | 'volatile';
+  type: 'concentrated' | 'stable' | 'volatile';
   hasPoints?: boolean;
   pointsText?: string;
   poolTvl?: {

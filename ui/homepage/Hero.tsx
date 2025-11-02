@@ -27,20 +27,23 @@ export default function Hero() {
     if (typeof window !== 'undefined') window.open('https://selora.gitbook.io/selora', '_blank');
   }, []);
 
-  const addToWaitlist = useCallback((email: string) => {
-    mutateWaitlist(
-      { email, date: new Date() },
-      {
-        onSuccess: () => {
-          setShowSuccess(true);
+  const addToWaitlist = useCallback(
+    (email: string) => {
+      mutateWaitlist(
+        { email, date: new Date() },
+        {
+          onSuccess: () => {
+            setShowSuccess(true);
+          },
+          onError: error => {
+            setErrorMessage(error.message);
+            setShowError(true);
+          },
         },
-        onError: error => {
-          setErrorMessage(error.message);
-          setShowError(true);
-        },
-      },
-    );
-  }, []);
+      );
+    },
+    [mutateWaitlist],
+  );
 
   return (
     <>
