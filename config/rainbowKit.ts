@@ -81,7 +81,7 @@ const config = createConfig({
   connectors,
   chains: [fluentTestnet],
   transports: {
-    [fluentTestnet.id]: http(),
+    [fluentTestnet.id]: http('https://rpc.testnet.fluent.xyz'),
   },
   ssr: true,
 });

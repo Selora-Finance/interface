@@ -2,15 +2,17 @@
 
 import { Themes } from '@/constants';
 import { Card } from '../../components/Card';
-import { ArrowLeftRight, PiggyBank, Vote } from 'lucide-react';
+import { RiTokenSwapFill } from 'react-icons/ri';
+import { FaPiggyBank } from 'react-icons/fa';
+import { TbGavel } from 'react-icons/tb';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
 import { useMemo } from 'react';
 
 const items = [
-  { title: 'Trade', text: 'Swap any asset with low fees & deep liquidity.', icon: ArrowLeftRight },
-  { title: 'Earn', text: 'Provide liquidity, lock $SELO, earn trading fees + emissions.', icon: PiggyBank },
-  { title: 'Govern', text: 'Vote with veSELO, direct emissions, earn bribes.', icon: Vote },
+  { title: 'Trade', text: 'Swap any asset with low fees & deep liquidity.', icon: RiTokenSwapFill },
+  { title: 'Earn', text: 'Provide liquidity, lock $SELO, earn trading fees + emissions.', icon: FaPiggyBank },
+  { title: 'Govern', text: 'Vote with veSELO, direct emissions, earn bribes.', icon: TbGavel },
 ];
 
 export default function HowItWorks() {
@@ -29,7 +31,7 @@ export default function HowItWorks() {
             variant="secondary"
             className="flex flex-col justify-center items-center gap-3 py-7 px-5 w-full md:w-1/4 self-stretch"
           >
-            <item.icon size={70} />
+            <item.icon size={90} />
             <h3 className="text-xl md:text-2xl font-medium">{item.title}</h3>
             <p className="text-sm md:text-lg my-16 text-center">{item.text}</p>
           </Card>

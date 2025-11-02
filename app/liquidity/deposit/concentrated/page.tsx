@@ -4,29 +4,74 @@ import { useAssetList } from '@/context/assets';
 import AssetListModal from '@/ui/AssetListModal';
 import ConcentratedLiquidityView from '@/ui/liquidity/ConcentratedLiquidityView';
 import CLRangeView from '@/ui/liquidity/CLRangeView';
-import { useCallback, useMemo, useState } from 'react';
-import { Address, getAddress, zeroAddress } from 'viem';
-import { useRouter } from 'next/navigation';
+import { useCallback, useEffect, useMemo, useState } from 'react';
+import { Address, formatUnits, getAddress, parseUnits, zeroAddress } from 'viem';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { Settings, ArrowLeft } from 'lucide-react';
 import { useWindowDimensions } from '@/hooks/utils';
-import { MAX_SCREEN_SIZES } from '@/constants';
+import {
+  BI_ZERO,
+  ETHER,
+  EXPLORERS,
+  LARGE_BASE_POINT,
+  MAX_SCREEN_SIZES,
+  NFPM,
+  REFETCH_INTERVALS,
+  V3_SQRT_PRICE_BASIS,
+} from '@/constants';
 import SettingsModal from '@/ui/SettingsModal';
+import { ConcentratedLiquidityQuerySchema, ConcentratedLiquidityQueryType } from '../__schema__';
+import useV3PoolSlot from '@/hooks/useV3PoolSlot';
+import useV3Pool from '@/hooks/useV3Pool';
+import useQLPoolInfo from '@/hooks/useQLPoolInfo';
+import { getTickFromPrice, normalizeSqrtPriceX96 } from '@/math';
+import { useChainId } from 'wagmi';
+import useApproveSpend from '@/hooks/useApproveSpend';
+import useGetAllowance from '@/hooks/useGetAllowance';
+import useAddLiquidityV3 from '@/hooks/liquidity/useAddLiquidityV3';
+import useIncreaseLiquidityV3 from '@/hooks/liquidity/useIncreaseLiquidityV3';
+import TransactionErrorModal from '@/ui/TransactionErrorModal';
+import TransactionSuccessModal from '@/ui/TransactionSuccessModal';
+import useGetBalance from '@/hooks/useGetBalance';
 
 type RangePreset = 'passive' | 'wide' | 'narrow' | 'aggressive' | 'intense';
 
 export default function ConcentratedLiquidity() {
   const router = useRouter();
+
+  const searchParams = useSearchParams();
+
+  // Query params
+  const queryParams = useMemo(() => {
+    const { data, error } = ConcentratedLiquidityQuerySchema.safeParse(Object.fromEntries(searchParams.entries()));
+    if (error && !data)
+      return {
+        token0: zeroAddress,
+        token1: zeroAddress,
+        tickSpacing: 100,
+        tokenId: BI_ZERO,
+      } as ConcentratedLiquidityQueryType;
+    return data;
+  }, [searchParams]);
+
   const [address0, setAddress0] = useState<Address>(zeroAddress);
   const [address1, setAddress1] = useState<Address>(zeroAddress);
 
   const [showModal0, setShowModal0] = useState<boolean>(false);
   const [showModal1, setShowModal1] = useState<boolean>(false);
 
-  const [feeTier, setFeeTier] = useState<string>('0.25%');
+  // Transaction modals parameters
+  const [showSuccess, setShowSuccess] = useState<boolean>(false);
+  const [showError, setShowError] = useState<boolean>(false);
+  const [transactionPreviewUrl, setTransactionPreviewUrl] = useState<string>('');
+
+  const [feeTier, setFeeTier] = useState<string>('0.25');
   const [rangeType, setRangeType] = useState<'preset' | 'custom'>('preset');
   const [rangePreset, setRangePreset] = useState<RangePreset>('passive');
   const [amount0, setAmount0] = useState<string>('');
   const [amount1, setAmount1] = useState<string>('');
+  const [tokenId, setTokenId] = useState<bigint>(BI_ZERO);
+  const feeTierParsed = useMemo(() => parseFloat(feeTier) * LARGE_BASE_POINT, [feeTier]);
 
   const [showSettings, setShowSettings] = useState<boolean>(false);
 
@@ -52,10 +97,20 @@ export default function ConcentratedLiquidity() {
     }
   };
 
+  const handleQueryParamsChange = useCallback(() => {
+    if (queryParams.token0) setAddress0(queryParams.token0 as Address);
+    if (queryParams.token1) setAddress1(queryParams.token1 as Address);
+    if (queryParams.tickSpacing) setFeeTier(String(queryParams.tickSpacing / LARGE_BASE_POINT));
+    if (queryParams.tokenId) setTokenId(queryParams.tokenId);
+  }, [queryParams.tickSpacing, queryParams.token0, queryParams.token1, queryParams.tokenId]);
+
   // Assets list
   const assets = useAssetList();
   const [asset0, asset1] = useMemo(() => {
-    return [assets.find(asset => asset.address === address0), assets.find(asset => asset.address === address1)];
+    return [
+      assets.find(asset => asset.address.toLowerCase() === address0.toLowerCase()),
+      assets.find(asset => asset.address.toLowerCase() === address1.toLowerCase()),
+    ];
   }, [assets, address0, address1]);
 
   const [currentPrice, setCurrentPrice] = useState<number>(0); // Mock current price
@@ -90,6 +145,12 @@ export default function ConcentratedLiquidity() {
     };
   }, [rangePreset, currentPrice, customMinPrice, customMaxPrice]);
 
+  // Parsed amounts
+  const [amount0Parsed, amount1Parsed] = useMemo(
+    () => [parseUnits(amount0, asset0?.decimals || 18), parseUnits(amount1, asset1?.decimals || 18)],
+    [amount0, amount1, asset0?.decimals, asset1?.decimals],
+  );
+
   // Handle range change from dragging
   const handleRangeChange = (min: number, max: number) => {
     setCustomMinPrice(min);
@@ -120,6 +181,114 @@ export default function ConcentratedLiquidity() {
 
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
+
+  const pool = useV3Pool(address0, address1, parseFloat(feeTier) * LARGE_BASE_POINT, REFETCH_INTERVALS);
+  const [sqrtPriceInBasis] = useV3PoolSlot(address0, address1, parseFloat(feeTier) * LARGE_BASE_POINT);
+  const poolInfo = useQLPoolInfo(pool, REFETCH_INTERVALS);
+
+  // SQRTPrice from current price
+  const newSQRTPrice = useMemo(() => {
+    if ((sqrtPriceInBasis === BI_ZERO || pool === zeroAddress) && asset0 && asset1) {
+      const sqrtPrice =
+        Math.sqrt(currentPrice * Math.pow(10, asset1.decimals - asset0.decimals)) * Number(V3_SQRT_PRICE_BASIS);
+      return BigInt(sqrtPrice);
+    }
+    return BI_ZERO;
+  }, [asset0, asset1, currentPrice, pool, sqrtPriceInBasis]);
+
+  const handleSQRTPriceBasisChange = useCallback(() => {
+    if (sqrtPriceInBasis > BI_ZERO && poolInfo) {
+      const termsOfSecondToken = poolInfo.token0.id.toLowerCase() === address0.toLowerCase();
+      const normalizedPrice = normalizeSqrtPriceX96(
+        sqrtPriceInBasis,
+        poolInfo.token0.decimals,
+        poolInfo.token1.decimals,
+        termsOfSecondToken,
+      );
+      setCurrentPrice(normalizedPrice);
+    }
+  }, [address0, poolInfo, sqrtPriceInBasis, setCurrentPrice]);
+
+  const chainId = useChainId();
+  const positionCreator = useMemo(() => NFPM[chainId], [chainId]);
+
+  // Allowances
+  const token0RouterAllowance = useGetAllowance(address0, positionCreator, REFETCH_INTERVALS);
+  const token1RouterAllowance = useGetAllowance(address1, positionCreator, REFETCH_INTERVALS);
+
+  // Approvals
+  const token0RouterApproval = useApproveSpend(address0, positionCreator, amount0Parsed);
+  const token1RouterApproval = useApproveSpend(address1, positionCreator, amount1Parsed);
+
+  // Add liquidity
+  const addLiquidity = useAddLiquidityV3(
+    address0,
+    address1,
+    feeTierParsed,
+    getTickFromPrice(minPrice, feeTierParsed),
+    getTickFromPrice(maxPrice, feeTierParsed),
+    amount0Parsed,
+    amount1Parsed,
+    newSQRTPrice,
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
+  );
+
+  // Increase liquidity
+  const increaseLiquidity = useIncreaseLiquidityV3(
+    tokenId,
+    amount0Parsed,
+    amount1Parsed,
+    address0.toLowerCase() === ETHER.toLowerCase()
+      ? '0'
+      : address1.toLowerCase() === ETHER.toLowerCase()
+      ? '1'
+      : undefined,
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
+  );
+
+  const initiateTransaction = useCallback(() => {
+    if (token0RouterAllowance < amount0Parsed) {
+      token0RouterApproval.reset();
+      return token0RouterApproval.execute();
+    }
+    if (token1RouterAllowance < amount1Parsed) {
+      token1RouterApproval.reset();
+      return token1RouterApproval.execute();
+    }
+
+    if (tokenId !== BI_ZERO) {
+      increaseLiquidity.reset();
+      return increaseLiquidity.execute();
+    }
+
+    addLiquidity.reset();
+    return addLiquidity.execute();
+  }, [
+    addLiquidity,
+    amount0Parsed,
+    amount1Parsed,
+    increaseLiquidity,
+    token0RouterAllowance,
+    token0RouterApproval,
+    token1RouterAllowance,
+    token1RouterApproval,
+    tokenId,
+  ]);
+
+  // Balances
+  const token0Balance = useGetBalance(address0, REFETCH_INTERVALS);
+  const token1Balance = useGetBalance(address1, REFETCH_INTERVALS);
+
+  useEffect(() => handleQueryParamsChange(), [handleQueryParamsChange]);
+  useEffect(() => handleSQRTPriceBasisChange(), [handleSQRTPriceBasisChange]);
 
   return (
     <>
@@ -157,6 +326,8 @@ export default function ConcentratedLiquidity() {
           <ConcentratedLiquidityView
             asset0={asset0}
             asset1={asset1}
+            token0Balance={formatUnits(token0Balance, asset0?.decimals ?? 18)}
+            token1Balance={formatUnits(token1Balance, asset1?.decimals ?? 18)}
             onSelector0Click={() => setShowModal0(true)}
             onSelector1Click={() => setShowModal1(true)}
             feeTier={feeTier}
@@ -176,6 +347,12 @@ export default function ConcentratedLiquidity() {
             onMaxPriceChange={setCustomMaxPrice}
             onCurrentPriceChange={setCurrentPrice}
             onSwitchClick={handleSwitchClick}
+            disableCurrentPriceEdit={sqrtPriceInBasis > BI_ZERO}
+            isLiquidityIncrease={tokenId !== BI_ZERO}
+            needsApproval={token0RouterAllowance < amount0Parsed || token1RouterAllowance < amount1Parsed}
+            asset0NeedsApproval={token0RouterAllowance < amount0Parsed}
+            isLoading={token0RouterApproval.isLoading || token1RouterApproval.isLoading || addLiquidity.isLoading}
+            onInitiateButtonClick={initiateTransaction}
           />
           <CLRangeView
             asset0={asset0}
@@ -207,6 +384,27 @@ export default function ConcentratedLiquidity() {
           setShowModal1(false);
         }}
         onClose={() => setShowModal1(false)}
+      />
+      <TransactionSuccessModal
+        title="Add Liquidity"
+        onHide={() => {
+          setShowSuccess(false);
+          token0RouterApproval.reset();
+          token1RouterApproval.reset();
+          addLiquidity.reset();
+        }}
+        show={showSuccess}
+        transactionPreviewUrl={transactionPreviewUrl}
+      />
+      <TransactionErrorModal
+        title="Add Liquidity"
+        onHide={() => {
+          token0RouterApproval.reset();
+          token1RouterApproval.reset();
+          addLiquidity.reset();
+          setShowError(false);
+        }}
+        show={showError}
       />
       <SettingsModal show={showSettings} onHide={() => setShowSettings(false)} />
     </>

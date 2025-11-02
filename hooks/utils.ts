@@ -1,5 +1,5 @@
 import { DEFAULT_PROCESS_DURATION } from '@/constants';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 interface WindowDimensions {
   width?: number;
@@ -32,9 +32,40 @@ export function useWindowDimensions() {
   return windowDimensions;
 }
 
-export function useSetTimeout(cb: () => void, delay = DEFAULT_PROCESS_DURATION) {
+export function useSetTimeout(cb: () => void | Promise<void>, delay = DEFAULT_PROCESS_DURATION) {
   return useEffect(() => {
     const timeout = setTimeout(cb, delay);
     return () => clearTimeout(timeout);
   }, [cb, delay]);
+}
+
+export function useSetInterval(cb: () => void | Promise<void>, INTERVAL = DEFAULT_PROCESS_DURATION) {
+  const savedCallback = useRef<() => void | Promise<void>>(null);
+
+  useEffect(() => {
+    savedCallback.current = cb;
+    Promise.resolve(cb()).then(() => {
+      console.info('useSetInterval callback [first invocation]');
+    });
+  }, [cb]);
+  return useEffect(() => {
+    function caller() {
+      if (savedCallback.current)
+        Promise.resolve(savedCallback.current()).then(() => {
+          console.info('useSetInterval callback invoked');
+        });
+    }
+    const interval = setInterval(caller, INTERVAL);
+    return () => clearInterval(interval);
+  }, [INTERVAL]);
+}
+
+export function useAtomicDate(delay: number = 1000) {
+  const [currentDateTime, setCurrentDateTime] = useState(new Date());
+
+  useEffect(() => {
+    const interval = setInterval(() => setCurrentDateTime(new Date()), delay);
+    return () => clearInterval(interval);
+  }, [delay]);
+  return currentDateTime;
 }

@@ -30,7 +30,7 @@ const DashboardPage = () => {
       id: 'lp-rewards',
       title: 'Your LPs Rewards',
       description: 'View and claim your liquidity rewards',
-      isActive: true,
+      isActive: false,
       onClick: () => {
         router.push('/liquidity/rewards');
       },

@@ -8,7 +8,7 @@ import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
 import { Search, X } from 'lucide-react';
 import Image from 'next/image';
-import { useMemo } from 'react';
+import { useMemo, useState } from 'react';
 
 interface AssetListModalProps {
   selectedAssets: Set<string>;
@@ -23,6 +23,19 @@ const AssetListModal: React.FC<AssetListModalProps> = ({ isOpen = false, onClose
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
+
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const filteredAssets = useMemo(
+    () =>
+      assets.filter(
+        asset =>
+          asset.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+          asset.symbol.toLowerCase().startsWith(searchQuery.toLowerCase()) ||
+          asset.address.toLowerCase().startsWith(searchQuery.toLowerCase()),
+      ),
+    [assets, searchQuery],
+  );
   return (
     <Modal isOpen={isOpen} onClose={onClose} variant={isDarkMode ? 'secondary' : 'primary'}>
       <div className={`flex flex-col gap-5 w-full px-2 py-3 ${isDarkMode ? 'text-white' : 'text-gray-800'}`}>
@@ -37,10 +50,14 @@ const AssetListModal: React.FC<AssetListModalProps> = ({ isOpen = false, onClose
         </div>
         <div className="w-full flex justify-start items-center gap-3 bg-transparent border border-[#ff4500] rounded-lg px-3 py-4">
           <Search size={25} />
-          <input className="flex-1 outline-0" placeholder="Search by name, symbol or address" />
+          <input
+            className="flex-1 outline-0"
+            placeholder="Search by name, symbol or address"
+            onChange={e => setSearchQuery(e.target.value)}
+          />
         </div>
         <div className="mt-4 flex flex-col justify-center items-center w-full gap-3 py-3 overflow-y-auto h-[calc(100%-22px)]">
-          {assets.map((asset, index) => (
+          {filteredAssets.map((asset, index) => (
             <button
               key={index}
               onClick={() => onAssetSelect(asset.address)}

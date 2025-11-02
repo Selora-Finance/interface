@@ -4,7 +4,9 @@ import { useState } from 'react';
 import { Button, Slider } from '@/components';
 import { PoolSelector } from './PoolSelector';
 
-interface LiquidityWithdrawViewProps {}
+interface LiquidityWithdrawViewProps {
+  withdraw?: boolean;
+}
 
 export function LiquidityWithdrawView({}: LiquidityWithdrawViewProps) {
   const [selectedPool, setSelectedPool] = useState<string | null>(null);

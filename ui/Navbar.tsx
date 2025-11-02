@@ -4,14 +4,12 @@ import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
 import { FaXTwitter, FaDiscord } from 'react-icons/fa6';
 import { useState, useEffect, useMemo } from 'react';
-import { useAccount, useDisconnect } from 'wagmi';
-import { useConnectModal } from '@rainbow-me/rainbowkit';
 import Logo from '@/components/Logo';
 import { useWindowDimensions } from '@/hooks/utils';
 import { MAX_SCREEN_SIZES, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
-import { Button } from '@/components';
+import CustomConnectButton from './CustomConnectButton';
 
 interface NavbarProps {
   defaultBg?: string; // Navbar background at top
@@ -26,11 +24,6 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
 
-  // RainbowKit hooks
-  const { isConnected, address } = useAccount();
-  const { openConnectModal } = useConnectModal();
-  const { disconnect } = useDisconnect();
-
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 50);
     window.addEventListener('scroll', handleScroll);
@@ -42,37 +35,21 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
     [mobileMenuBg, scrolled, scrolledBg, defaultBg],
   );
 
-  // Format address for display
-  const formatAddress = (address: string) => {
-    return `${address.slice(0, 6)}...${address.slice(-4)}`;
-  };
-
-  // Handle wallet connection/disconnection
-  const handleWalletClick = () => {
-    if (isConnected) {
-      disconnect();
-    } else {
-      openConnectModal?.();
-    }
-  };
-
   return (
     <nav
-      className={`px-6 py-4 md:py-8 flex justify-between items-center fixed transition-all duration-500 w-dvw z-20 ${
+      className={`px-6 py-4 flex justify-between items-center fixed transition-all duration-500 w-dvw z-20 ${
         scrolled ? scrolledBg + ' shadow-lg' : defaultBg
       } ${scrolled || !isDarkMode ? 'text-[#000]' : 'text-white'}`}
     >
       {/* Logo */}
-      <div className="flex justify-center items-center gap-4">
-        <Link href="/">
-          <Logo className="w-10 h-10 rounded-full" />
-        </Link>
+      <Link href="/" className="flex justify-center items-center gap-4 cursor-pointer">
+        <Logo className="w-10 h-10 rounded-full" />
         <span
           className={`${scrolled || !isDarkMode ? 'text-[#000]' : 'text-[#fff]'} font-bold text-3xl hidden md:block`}
         >
           Selora
         </span>
-      </div>
+      </Link>
 
       {/* Desktop Nav */}
       <div className="hidden md:flex gap-6 justify-center items-center">
@@ -97,22 +74,26 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
             <FaDiscord size={30} />
           </a>
         </div>
-        <Button
+        {/* <Button
           onClick={handleWalletClick}
-          className="hidden md:block px-6 py-2 rounded-lg text-white transition-colors cursor-pointer"
+          className={`hidden md:block px-6 py-2 rounded-lg text-white transition-colors cursor-pointer ${isConnected && "border border-[#f8f8f8]"}`}
         >
           {isConnected ? formatAddress(address!) : 'Connect'}
-        </Button>
+        </Button> */}
+        <div className="hidden md:block">
+          <CustomConnectButton />
+        </div>
       </div>
 
       {/* Mobile Menu Button + Connect */}
       <div className="flex items-center gap-2 md:hidden ml-auto">
-        <Button
+        {/* <Button
           onClick={handleWalletClick}
           className="hidden md:block px-6 py-2 rounded-lg text-white transition-colors cursor-pointer"
         >
           {isConnected ? formatAddress(address!) : 'Connect'}
-        </Button>
+        </Button> */}
+        <CustomConnectButton />
         <button
           onClick={() => setOpen(prev => !prev)}
           aria-label="Toggle Menu"

@@ -102,16 +102,16 @@ const PoolRow: React.FC<PoolRowProps> = ({ pool, onDeposit }) => {
           </div>
         </div>
 
-        {(pool.token0.amount || pool.token1.amount) && (
+        {(pool.reserves?.token0 || pool.reserves?.token1) && (
           <div className="flex flex-wrap gap-2 text-xs">
-            {pool.token0.amount && (
+            {pool.reserves.token0 && (
               <span className="text-gray-500">
-                {pool.token0.amount} {pool.token0.symbol}
+                {pool.reserves.token0} {pool.token0.symbol}
               </span>
             )}
-            {pool.token1.amount && (
+            {pool.reserves.token1 && (
               <span className="text-gray-500">
-                {pool.token1.amount} {pool.token1.symbol}
+                {pool.reserves.token1} {pool.token1.symbol}
               </span>
             )}
           </div>
@@ -135,7 +135,7 @@ const PoolRow: React.FC<PoolRowProps> = ({ pool, onDeposit }) => {
     >
       {/* Pool Info */}
       <div className="flex flex-col gap-2">
-        <div className="flex items-center gap-3">
+        <div className="flex items-center justify-start gap-3">
           <div className="flex items-center -space-x-2">
             <Image
               src={pool.token0.logoURI}
@@ -175,65 +175,73 @@ const PoolRow: React.FC<PoolRowProps> = ({ pool, onDeposit }) => {
       </div>
 
       {/* Volume */}
-      <div className="flex flex-col gap-1 items-end">
-        <span className="font-semibold">{pool.volume}</span>
-        {(pool.token0.amount || pool.token1.amount) && (
-          <div className="flex flex-col gap-1 mt-6 items-end">
-            {pool.token0.amount && (
-              <span className="text-xs text-gray-500">
-                {pool.token0.amount} {pool.token0.symbol}
-              </span>
-            )}
-            {pool.token1.amount && (
-              <span className="text-xs text-gray-500">
-                {pool.token1.amount} {pool.token1.symbol}
-              </span>
-            )}
-          </div>
-        )}
+      <div className="flex justify-start">
+        <div className="flex flex-col gap-1 items-end">
+          <span className="font-semibold text-end">{pool.volume}</span>
+          {(pool.token0.amount || pool.token1.amount) && (
+            <div className="flex flex-col gap-1 mt-6 items-end">
+              {pool.token0.amount && (
+                <span className="text-xs text-gray-500">
+                  {pool.token0.amount} {pool.token0.symbol}
+                </span>
+              )}
+              {pool.token1.amount && (
+                <span className="text-xs text-gray-500">
+                  {pool.token1.amount} {pool.token1.symbol}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Fees */}
-      <div className="flex flex-col gap-1 items-end">
-        <span className="font-semibold">{pool.fees}</span>
-        {pool.feeAmounts && (
-          <div className="flex flex-col gap-1 mt-6 items-end">
-            <span className="text-xs text-gray-500">
-              {pool.feeAmounts.token0} {pool.token0.symbol}
-            </span>
-            <span className="text-xs text-gray-500">
-              {pool.feeAmounts.token1} {pool.token1.symbol}
-            </span>
-          </div>
-        )}
+      <div className="flex justify-start">
+        <div className="flex flex-col gap-1 items-end">
+          <span className="font-semibold text-end">{pool.fees}</span>
+          {pool.feeAmounts && (
+            <div className="flex flex-col gap-1 mt-6 items-end">
+              <span className="text-xs text-gray-500">
+                {pool.feeAmounts.token0} {pool.token0.symbol}
+              </span>
+              <span className="text-xs text-gray-500">
+                {pool.feeAmounts.token1} {pool.token1.symbol}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* TVL */}
-      <div className="flex flex-col gap-1 items-end">
-        <span className="font-semibold">{pool.tvl}</span>
-        {pool.reserves && (
-          <div className="flex flex-col gap-1 mt-6 items-end">
-            <span className="text-xs text-gray-500">
-              {pool.reserves.token0} {pool.token0.symbol}
-            </span>
-            <span className="text-xs text-gray-500">
-              {pool.reserves.token1} {pool.token1.symbol}
-            </span>
-          </div>
-        )}
+      <div className="flex justify-start">
+        <div className="flex flex-col gap-1 items-end">
+          <span className="font-semibold text-end">{pool.tvl}</span>
+          {pool.reserves && (
+            <div className="flex flex-col gap-1 mt-6 items-end">
+              <span className="text-xs text-gray-500">
+                {pool.reserves.token0} {pool.token0.symbol}
+              </span>
+              <span className="text-xs text-gray-500">
+                {pool.reserves.token1} {pool.token1.symbol}
+              </span>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* APR */}
-      <div className="flex flex-col gap-1">
-        <span className="font-semibold">{pool.apr}</span>
-        <div className="mt-6">
-          <Button
-            variant="primary"
-            className="px-4 py-2 text-sm whitespace-nowrap"
-            onClick={() => onDeposit?.(pool.id)}
-          >
-            New Deposit
-          </Button>
+      <div className="flex justify-start">
+        <div className="flex flex-col gap-1 items-end">
+          <span className="font-semibold">{pool.apr}</span>
+          <div className="mt-6">
+            <Button
+              variant="primary"
+              className="px-4 py-2 text-sm whitespace-nowrap"
+              onClick={() => onDeposit?.(pool.id)}
+            >
+              New Deposit
+            </Button>
+          </div>
         </div>
       </div>
     </div>

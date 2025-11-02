@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { Button, Card } from '@/components';
+import { Button, Card, Spinner } from '@/components';
 import { MAX_SCREEN_SIZES, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { AssetType } from '@/typings';
@@ -11,6 +11,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useWindowDimensions } from '@/hooks/utils';
 import { MdSwapVert } from 'react-icons/md';
 import SettingsModal from '../SettingsModal';
+import { formatNumber } from '@/lib/client/utils';
 
 type RangePreset = 'passive' | 'wide' | 'narrow' | 'aggressive' | 'intense';
 
@@ -36,6 +37,14 @@ interface ConcentratedLiquidityViewProps {
   onMinPriceChange?: (value: number) => void;
   onMaxPriceChange?: (value: number) => void;
   onCurrentPriceChange?: (value: number) => void;
+  disableCurrentPriceEdit?: boolean;
+  isLiquidityIncrease?: boolean;
+  needsApproval?: boolean;
+  asset0NeedsApproval?: boolean;
+  onInitiateButtonClick?: () => void;
+  isLoading?: boolean;
+  token0Balance?: string | number;
+  token1Balance?: string | number;
 }
 
 const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
@@ -43,7 +52,7 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
   asset1,
   onSelector0Click,
   onSelector1Click,
-  feeTier = '0.25%',
+  feeTier = '0.25',
   onFeeTierChange,
   rangeType = 'preset',
   onRangeTypeChange,
@@ -56,6 +65,14 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
   currentPrice = 0,
   minPrice = 0,
   maxPrice = 0,
+  disableCurrentPriceEdit = false,
+  isLiquidityIncrease = false,
+  needsApproval = false,
+  asset0NeedsApproval = false,
+  isLoading = false,
+  onInitiateButtonClick,
+  token0Balance = 0,
+  token1Balance = 0,
   onMinPriceChange,
   onMaxPriceChange,
   onCurrentPriceChange,
@@ -68,11 +85,16 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
   const [feeDropdownOpen, setFeeDropdownOpen] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
 
+  const balanceIsSufficient = useMemo(() => {
+    return Number(token0Balance) >= Number(amount0) && Number(token1Balance) >= Number(amount1);
+  }, [amount0, amount1, token0Balance, token1Balance]);
+
   const feeOptions = [
-    { value: '0.01%', label: '0.01%', earnsPoints: false },
-    { value: '0.05%', label: '0.05%', earnsPoints: false },
-    { value: '0.25%', label: '0.25%', earnsPoints: true },
-    { value: '1%', label: '1%', earnsPoints: false },
+    { value: '0.01', label: '0.01%', earnsPoints: false },
+    { value: '0.05', label: '0.05%', earnsPoints: false },
+    { value: '0.06', label: '0.06%', earnsPoints: true },
+    { value: '0.3', label: '0.3%', earnsPoints: false },
+    { value: '1', label: '1%', earnsPoints: false },
   ];
 
   const rangePresets: { value: RangePreset; label: string; percentage: string }[] = [
@@ -190,6 +212,7 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
                   type="number"
                   className="no-spinner bg-transparent outline-0"
                   value={currentPrice}
+                  disabled={disableCurrentPriceEdit || isLiquidityIncrease}
                   onChange={e => onCurrentPriceChange?.(e.target.valueAsNumber)}
                 />
                 <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>
@@ -199,100 +222,104 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
             </div>
 
             {/* Fee Tier Selector */}
-            <div className="w-full flex flex-col gap-2">
-              <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Fee Tier:</span>
-              <div className="relative">
-                <button
-                  onClick={() => setFeeDropdownOpen(!feeDropdownOpen)}
-                  className={`w-full p-4 rounded-lg border flex justify-between items-center ${
-                    isDarkMode ? 'bg-[#211b1b] border-[#333333]' : 'bg-white border-[#d9d9d9]'
-                  }`}
-                >
-                  <div className="flex items-center gap-2">
-                    <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{feeTier}</span>
-                    {feeOptions.find(opt => opt.value === feeTier)?.earnsPoints && (
-                      <span
-                        className={`text-xs px-2 py-1 rounded ${
-                          isDarkMode ? 'bg-[#d0de27] text-black' : 'bg-orange-600 text-white'
-                        }`}
-                      >
-                        Earns Points
-                      </span>
-                    )}
-                  </div>
-                  <ChevronDown size={18} />
-                </button>
-                {feeDropdownOpen && (
-                  <div
-                    className={`absolute top-full left-0 right-0 mt-2 rounded-lg border overflow-hidden z-10 ${
+            {!isLiquidityIncrease && (
+              <div className="w-full flex flex-col gap-2">
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Fee Tier:</span>
+                <div className="relative">
+                  <button
+                    onClick={() => setFeeDropdownOpen(!feeDropdownOpen)}
+                    className={`w-full p-4 rounded-lg border flex justify-between items-center ${
                       isDarkMode ? 'bg-[#211b1b] border-[#333333]' : 'bg-white border-[#d9d9d9]'
                     }`}
                   >
-                    {feeOptions.map(option => (
-                      <button
-                        key={option.value}
-                        onClick={() => {
-                          onFeeTierChange?.(option.value);
-                          setFeeDropdownOpen(false);
-                        }}
-                        className={`w-full p-3 flex justify-between items-center transition-colors ${
-                          isDarkMode ? 'hover:bg-[#333333]' : 'hover:bg-[#f5f5f5]'
-                        } ${feeTier === option.value ? (isDarkMode ? 'bg-[#333333]' : 'bg-[#f5f5f5]') : ''}`}
-                      >
-                        <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{option.label}</span>
-                        {option.earnsPoints && (
-                          <span
-                            className={`text-xs px-2 py-1 rounded ${
-                              isDarkMode ? 'bg-[#d0de27] text-black' : 'bg-orange-600 text-white'
-                            }`}
-                          >
-                            Earns Points
-                          </span>
-                        )}
-                      </button>
-                    ))}
-                  </div>
-                )}
+                    <div className="flex items-center gap-2">
+                      <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{feeTier}</span>
+                      {feeOptions.find(opt => opt.value === feeTier)?.earnsPoints && (
+                        <span
+                          className={`text-xs px-2 py-1 rounded ${
+                            isDarkMode ? 'bg-[#d0de27] text-black' : 'bg-orange-600 text-white'
+                          }`}
+                        >
+                          Earns Points
+                        </span>
+                      )}
+                    </div>
+                    <ChevronDown size={18} />
+                  </button>
+                  {feeDropdownOpen && (
+                    <div
+                      className={`absolute top-full left-0 right-0 mt-2 rounded-lg border overflow-hidden z-10 ${
+                        isDarkMode ? 'bg-[#211b1b] border-[#333333]' : 'bg-white border-[#d9d9d9]'
+                      }`}
+                    >
+                      {feeOptions.map(option => (
+                        <button
+                          key={option.value}
+                          onClick={() => {
+                            onFeeTierChange?.(option.value);
+                            setFeeDropdownOpen(false);
+                          }}
+                          className={`w-full p-3 flex justify-between items-center transition-colors ${
+                            isDarkMode ? 'hover:bg-[#333333]' : 'hover:bg-[#f5f5f5]'
+                          } ${feeTier === option.value ? (isDarkMode ? 'bg-[#333333]' : 'bg-[#f5f5f5]') : ''}`}
+                        >
+                          <span className={`${isMobile ? 'text-sm' : 'text-base'}`}>{option.label}</span>
+                          {option.earnsPoints && (
+                            <span
+                              className={`text-xs px-2 py-1 rounded ${
+                                isDarkMode ? 'bg-[#d0de27] text-black' : 'bg-orange-600 text-white'
+                              }`}
+                            >
+                              Earns Points
+                            </span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Select Range */}
-            <div className="w-full flex flex-col gap-3">
-              <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Select Range</span>
-              <div className="flex gap-3">
-                <button
-                  onClick={() => onRangeTypeChange?.('preset')}
-                  className={`px-4 py-2 rounded-lg transition-all ${isMobile ? 'text-sm' : 'text-base'} ${
-                    rangeType === 'preset'
-                      ? isDarkMode
-                        ? 'bg-[#d0de27] text-black'
-                        : 'bg-orange-600 text-white'
-                      : isDarkMode
-                      ? 'bg-[#333333] text-white'
-                      : 'bg-[#f5f5f5] text-[#000]'
-                  }`}
-                >
-                  Preset Ranges
-                </button>
-                <button
-                  onClick={() => onRangeTypeChange?.('custom')}
-                  className={`px-4 py-2 rounded-lg transition-all ${isMobile ? 'text-sm' : 'text-base'} ${
-                    rangeType === 'custom'
-                      ? isDarkMode
-                        ? 'bg-[#d0de27] text-black'
-                        : 'bg-orange-600 text-white'
-                      : isDarkMode
-                      ? 'bg-[#333333] text-white'
-                      : 'bg-[#f5f5f5] text-[#000]'
-                  }`}
-                >
-                  Custom Range
-                </button>
+            {!isLiquidityIncrease && (
+              <div className="w-full flex flex-col gap-3">
+                <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>Select Range</span>
+                <div className="flex gap-3">
+                  <button
+                    onClick={() => onRangeTypeChange?.('preset')}
+                    className={`px-4 py-2 rounded-lg transition-all ${isMobile ? 'text-sm' : 'text-base'} ${
+                      rangeType === 'preset'
+                        ? isDarkMode
+                          ? 'bg-[#d0de27] text-black'
+                          : 'bg-orange-600 text-white'
+                        : isDarkMode
+                        ? 'bg-[#333333] text-white'
+                        : 'bg-[#f5f5f5] text-[#000]'
+                    }`}
+                  >
+                    Preset Ranges
+                  </button>
+                  <button
+                    onClick={() => onRangeTypeChange?.('custom')}
+                    className={`px-4 py-2 rounded-lg transition-all ${isMobile ? 'text-sm' : 'text-base'} ${
+                      rangeType === 'custom'
+                        ? isDarkMode
+                          ? 'bg-[#d0de27] text-black'
+                          : 'bg-orange-600 text-white'
+                        : isDarkMode
+                        ? 'bg-[#333333] text-white'
+                        : 'bg-[#f5f5f5] text-[#000]'
+                    }`}
+                  >
+                    Custom Range
+                  </button>
+                </div>
               </div>
-            </div>
+            )}
 
             {/* Range Presets */}
-            {rangeType === 'preset' && (
+            {rangeType === 'preset' && !isLiquidityIncrease && (
               <div className="w-full grid grid-cols-2 md:grid-cols-3 gap-3">
                 {rangePresets.map(preset => (
                   <button
@@ -327,15 +354,15 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
             )}
 
             {/* Custom Range Inputs */}
-            {rangeType === 'custom' && (
+            {rangeType === 'custom' && !isLiquidityIncrease && (
               <div className="w-full flex flex-col gap-4">
                 {/* Labels */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
-                    Min {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
+                    Min {asset1?.symbol || 'Token1'} per {asset0?.symbol || 'Token0'}
                   </span>
                   <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 md:block hidden`}>
-                    Max {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
+                    Max {asset1?.symbol || 'Token1'} per {asset0?.symbol || 'Token0'}
                   </span>
                 </div>
 
@@ -404,7 +431,7 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
 
                   {/* Mobile: Max Label */}
                   <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500 md:hidden block mt-2`}>
-                    Max {asset0?.symbol || 'Token0'} per {asset1?.symbol || 'Token1'}
+                    Max {asset1?.symbol || 'Token1'} per {asset0?.symbol || 'Token0'}
                   </span>
 
                   {/* Max Price Input Container */}
@@ -500,7 +527,9 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
                       {asset0?.symbol || 'Token 0'}
                     </span>
                   </div>
-                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>0.000 Max</span>
+                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                    {formatNumber(token0Balance)} Max
+                  </span>
                 </div>
                 <div
                   className={`border w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2 ${
@@ -548,7 +577,9 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
                       {asset1?.symbol || 'Token 1'}
                     </span>
                   </div>
-                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>0.000 Max</span>
+                  <span className={`${isMobile ? 'text-xs' : 'text-sm'} text-gray-500`}>
+                    {formatNumber(token1Balance)} Max
+                  </span>
                 </div>
                 <div
                   className={`border w-full rounded-lg flex justify-start items-center px-3 py-3 gap-2 ${
@@ -581,8 +612,35 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
             </div>
 
             {/* Approve Button */}
-            <Button variant="primary" className="w-full py-4 text-base md:text-lg font-semibold">
-              Approve {asset0?.symbol || 'Token 0'}
+            <Button
+              variant="primary"
+              className="w-full py-4 text-base md:text-lg font-semibold gap-2 flex justify-center items-center"
+              onClick={onInitiateButtonClick}
+              disabled={
+                isLoading ||
+                amount0.trim().length === 0 ||
+                amount1.trim().length === 0 ||
+                parseFloat(amount0) === 0 ||
+                parseFloat(amount1) === 0 ||
+                !balanceIsSufficient
+              }
+            >
+              {balanceIsSufficient ? (
+                <>
+                  {needsApproval ? (
+                    <>
+                      {asset0NeedsApproval
+                        ? `Approve to spend ${asset0?.symbol}`
+                        : `Approve to spend ${asset1?.symbol}`}
+                    </>
+                  ) : (
+                    <>{isLiquidityIncrease ? 'Increase Position' : 'Add Liquidity'}</>
+                  )}
+                </>
+              ) : (
+                'Insufficient Balance'
+              )}
+              {isLoading && <Spinner size="sm" />}
             </Button>
           </div>
         </Card>

@@ -1,74 +1,21 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { Card } from '@/components';
-import { Themes } from '@/constants';
+import { REFETCH_INTERVALS, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { useAtom } from 'jotai';
 import PositionsHero from '@/ui/liquidity/PositionsHero';
 import PositionFilters from '@/ui/liquidity/PositionFilters';
 import SearchBar from '@/ui/liquidity/SearchBar';
 import PositionTable from '@/ui/liquidity/PositionTable';
-import { PositionData } from '@/typings';
+import useQLAccountInfo from '@/hooks/useQLAccountInfo';
+import { calculatePositionPercentage, mapGQLUserLiquidityPositions } from '@/lib/client/utils';
+import { LiquidityPosition } from '@/gql/codegen/graphql';
+import { useAssetList } from '@/context/assets';
 
 // Mock position data for the user
-const MOCK_POSITIONS: PositionData[] = [
-  {
-    id: '1',
-    token0: {
-      symbol: 'ETH',
-      logoURI:
-        'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png',
-      amount: '3.52',
-    },
-    token1: {
-      symbol: 'CEDA',
-      logoURI:
-        'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-      amount: '19,366.48',
-    },
-    tvl: '~$276,271.17',
-    apr: '38.06%',
-    yourDeposit: '~$9.14K',
-    staked: '~$9.14K',
-    feeRate: '0.3%',
-    type: 'volatile',
-    hasPoints: true,
-    pointsText: '10x Points + veCEDA',
-    poolTvl: {
-      token0: '79.0',
-      token1: '88,888.65',
-    },
-  },
-  {
-    id: '2',
-    token0: {
-      symbol: 'bcUSD',
-      logoURI:
-        'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-      amount: '3.52',
-    },
-    token1: {
-      symbol: 'CEDA',
-      logoURI:
-        'https://raw.githubusercontent.com/Uniswap/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png',
-      amount: '19,366.48',
-    },
-    tvl: '~$276,271.17',
-    apr: '38.06%',
-    yourDeposit: '~$9.14K',
-    staked: '~$9.14K',
-    feeRate: '0.3%',
-    type: 'concentrated',
-    hasPoints: true,
-    pointsText: '10x Points + veCEDA',
-    poolTvl: {
-      token0: '79.0',
-      token1: '88,888.65',
-    },
-  },
-];
 
 const LiquidityPositionsPage = () => {
   const [theme] = useAtom(themeAtom);
@@ -78,9 +25,39 @@ const LiquidityPositionsPage = () => {
   const [activeFilter, setActiveFilter] = useState<'all' | 'concentrated' | 'stable' | 'volatile'>('all');
   const [searchQuery, setSearchQuery] = useState('');
 
+  // Asset list
+  const assets = useAssetList();
+
+  // Function to find asset
+  const lookupAsset = useCallback(
+    (id?: string) => {
+      return assets.find(asset => asset.address.toLowerCase() === id?.toLowerCase());
+    },
+    [assets],
+  );
+
+  const accountInfo = useQLAccountInfo(REFETCH_INTERVALS);
+  const qlPositions = useMemo(
+    () => mapGQLUserLiquidityPositions((accountInfo?.lpPositions || []) as LiquidityPosition[], lookupAsset),
+    [accountInfo?.lpPositions, lookupAsset],
+  );
+
+  const [userTVLUSD, userFeeUSD] = useMemo(() => {
+    if (!accountInfo) return [0, 0];
+    return accountInfo.lpPositions.reduce<[number, number]>(
+      (previousValue, currentValue) => {
+        const positionPercentage = calculatePositionPercentage(currentValue.position, currentValue.pool.totalSupply);
+        const depositedUSD = positionPercentage * parseFloat(currentValue.pool.reserveUSD);
+        const feeUSD = positionPercentage * parseFloat(currentValue.pool.totalFeesUSD);
+        return [previousValue[0] + depositedUSD, previousValue[1] + feeUSD];
+      },
+      [0, 0],
+    );
+  }, [accountInfo]);
+
   // Filter positions based on active filter and search query
   const filteredPositions = useMemo(() => {
-    return MOCK_POSITIONS.filter(position => {
+    return qlPositions.filter(position => {
       const matchesFilter = activeFilter === 'all' || position.type === activeFilter;
       const matchesSearch =
         position.token0.symbol.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -89,7 +66,7 @@ const LiquidityPositionsPage = () => {
 
       return matchesFilter && matchesSearch;
     });
-  }, [activeFilter, searchQuery]);
+  }, [activeFilter, qlPositions, searchQuery]);
 
   const handleNewDeposit = () => {
     router.push('/liquidity/deposit');
@@ -118,7 +95,12 @@ const LiquidityPositionsPage = () => {
         variant={isDarkMode ? 'neutral' : 'primary'}
         className={`flex flex-col w-full px-4 md:px-6 py-6 md:py-8 ${!isDarkMode && 'border border-[#d9d9d9]'}`}
       >
-        <PositionsHero totalPositions={MOCK_POSITIONS.length} onNewDepositClick={handleNewDeposit} />
+        <PositionsHero
+          totalPositions={accountInfo?.lpPositions.length || 0}
+          tvl={userTVLUSD}
+          fees={userFeeUSD}
+          onNewDepositClick={handleNewDeposit}
+        />
       </Card>
 
       {/* Positions Title */}

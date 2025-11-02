@@ -1,13 +1,16 @@
 'use client';
 
 import { Card, LineChart } from '@/components';
-import { MAX_SCREEN_SIZES, Themes } from '@/constants';
+import { BASE_POINT, MAX_SCREEN_SIZES, REFETCH_INTERVALS, Themes } from '@/constants';
 import { themeAtom } from '@/store';
 import { AssetType } from '@/typings';
 import { useAtom } from 'jotai';
-import { useMemo } from 'react';
+import { useId, useMemo } from 'react';
 import { useWindowDimensions } from '@/hooks/utils';
 import Image from 'next/image';
+import useQLTokenInfo from '@/hooks/useQLTokenInfo';
+import useQLTokenDayChartMovement from '@/hooks/useQLTokenDayChartMovement';
+import { formatNumber, isValidNonZeroNumberString } from '@/lib/client/utils';
 
 interface CLRangeViewProps {
   asset0?: AssetType | null;
@@ -29,119 +32,41 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
   currentPrice = 0.00002454738,
   amount0 = '0',
   amount1 = '0',
-  feeTier = '0.25%',
+  feeTier = '0.25',
   onRangeChange,
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
   const dimensions = useWindowDimensions();
   const isMobile = useMemo(() => dimensions.width && dimensions.width <= MAX_SCREEN_SIZES.MOBILE, [dimensions.width]);
+  const placeHolderId = useId();
 
-  // // Calculate TVL
-  // const tvl = useMemo(() => {
-  //   const amt0 = parseFloat(amount0) || 0;
-  //   const amt1 = parseFloat(amount1) || 0;
-  //   // Mock calculation - in real app, this would use actual prices
-  //   return (amt0 * 2000 + amt1 * 0.5).toFixed(2);
-  // }, [amount0, amount1]);
-
-  // Deterministic pseudo-random number generator (seeded)
-  function mulberry32(seed: number) {
-    return function () {
-      let t = (seed += 0x6d2b79f5);
-      t = Math.imul(t ^ (t >>> 15), t | 1);
-      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
-    };
-  }
+  const token0Info = useQLTokenInfo(asset0?.address.toLowerCase() ?? placeHolderId, REFETCH_INTERVALS);
+  const token1DayData = useQLTokenDayChartMovement(asset1?.address.toLowerCase() ?? placeHolderId, REFETCH_INTERVALS);
 
   // Generate chart data with realistic price movement using Geometric Brownian Motion
   const chartData = useMemo(() => {
-    const data = [];
-    const totalPoints = 200; // More data points for smoother visualization
-    const daysOfHistory = 30; // 30 days of historical data
-
-    // Start date (X days ago)
-    const startDate = new Date();
-    startDate.setDate(startDate.getDate() - daysOfHistory);
-
-    // Simulation parameters for realistic price movement
-    const dt = 1 / (totalPoints / daysOfHistory); // Time step (fraction of a day)
-    const volatility = 0.15; // 15% annual volatility
-    const drift = 0.05; // 5% annual drift (slight upward trend)
-
-    // Initialize with a starting price (slightly lower than current)
-    let price = currentPrice * 0.85;
-
-    // Add trend phases for more realism
-    const trendPhases = [
-      { start: 0, end: 0.3, bias: -0.02 }, // Initial decline
-      { start: 0.3, end: 0.6, bias: 0.03 }, // Recovery
-      { start: 0.6, end: 0.85, bias: -0.01 }, // Consolidation with slight decline
-      { start: 0.85, end: 1.0, bias: 0.02 }, // Recent uptrend to current price
-    ];
-
-    // Support and resistance levels for more realistic bounces
-    const supportLevel = currentPrice * 0.75;
-    const resistanceLevel = currentPrice * 1.15;
-
-    // Use a stable seed based on currentPrice for deterministic results
-    const rand = mulberry32(Math.floor(currentPrice * 1e8));
-
-    for (let i = 0; i < totalPoints; i++) {
-      const progress = i / totalPoints;
-
-      // Determine current trend phase
-      let phaseBias = 0;
-      for (const phase of trendPhases) {
-        if (progress >= phase.start && progress < phase.end) {
-          phaseBias = phase.bias;
-          break;
-        }
-      }
-
-      // Generate random component (Wiener process) using deterministic PRNG
-      const randomShock = (rand() - 0.5) * 2;
-
-      // Geometric Brownian Motion formula with trend bias
-      const dPrice = price * ((drift + phaseBias) * dt + volatility * Math.sqrt(dt) * randomShock);
-      price = price + dPrice;
-
-      // Add mean reversion near support/resistance
-      if (price < supportLevel) {
-        price = supportLevel + (price - supportLevel) * 0.3 + rand() * currentPrice * 0.02;
-      } else if (price > resistanceLevel) {
-        price = resistanceLevel - (resistanceLevel - price) * 0.3 - rand() * currentPrice * 0.02;
-      }
-
-      // Add micro-structure (intraday patterns)
-      const microNoise = Math.sin(i * 0.5) * currentPrice * 0.003;
-      price += microNoise;
-
-      // Ensure price stays within reasonable bounds
-      price = Math.max(supportLevel * 0.95, Math.min(resistanceLevel * 1.05, price));
-
-      // Calculate timestamp for this point (hourly intervals)
-      const pointDate = new Date(startDate);
-      pointDate.setHours(startDate.getHours() + (i * daysOfHistory * 24) / totalPoints);
-
-      data.push({
-        x: pointDate.getTime(),
-        y: price,
-        date: pointDate,
-      });
-    }
-
+    const data = token1DayData.map(dayData => {
+      const x = dayData.date * BASE_POINT;
+      const y =
+        isValidNonZeroNumberString(dayData.priceUSD) && token0Info && isValidNonZeroNumberString(token0Info.derivedUSD)
+          ? parseFloat(dayData.priceUSD) / parseFloat(token0Info.derivedUSD)
+          : 0;
+      const date = new Date(x);
+      return { x, y, date };
+    });
+    const totalPoints = 200;
     // Ensure the last few points converge to current price for realism
     const convergencePoints = 10;
     for (let i = totalPoints - convergencePoints; i < totalPoints; i++) {
       const idx = data.length - (totalPoints - i);
       const convergenceFactor = (i - (totalPoints - convergencePoints)) / convergencePoints;
-      data[idx].y = data[idx].y * (1 - convergenceFactor) + currentPrice * convergenceFactor;
+      if (data[idx]) {
+        data[idx].y = data[idx].y * (1 - convergenceFactor) + currentPrice * convergenceFactor;
+      }
     }
-
     return data;
-  }, [currentPrice]);
+  }, [currentPrice, token0Info, token1DayData]);
 
   return (
     <div className="flex justify-center items-start w-full md:w-[48%]">
@@ -161,7 +86,7 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
             <div className="w-full flex flex-col md:flex-row justify-between items-start md:items-center gap-3">
               <div className="flex items-center gap-2">
                 <span className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>
-                  {asset1?.symbol || 'Token0'} price in {asset0?.symbol || 'Token1'}
+                  {asset0?.symbol || 'Token0'} price in {asset1?.symbol || 'Token1'}
                 </span>
                 {/* <button className="p-1 rounded hover:bg-gray-700 transition-colors">
                   <svg
@@ -182,7 +107,8 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
                 </button> */}
               </div>
               <span className={`${isMobile ? 'text-sm' : 'text-base'} font-semibold`}>
-                Current: {currentPrice.toFixed(5)} {asset1?.symbol || 'Token0'}/{asset0?.symbol || 'Token1'}
+                Current: {formatNumber(currentPrice.toFixed(5))} {asset1?.symbol || 'Token1'}/
+                {asset0?.symbol || 'Token0'}
               </span>
             </div>
           </div>
