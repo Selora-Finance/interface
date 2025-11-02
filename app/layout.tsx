@@ -2,6 +2,7 @@ import type { Metadata } from 'next';
 import './globals.css';
 import '@rainbow-me/rainbowkit/styles.css';
 import { AppView } from './__render__';
+import { Suspense } from 'react';
 
 export const metadata: Metadata = {
   title: 'Selora Finance | Central liquidity & trading marketplace on Fluent',
@@ -16,7 +17,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <AppView>{children}</AppView>
+      <Suspense>
+        <AppView>{children}</AppView>
+      </Suspense>
     </html>
   );
 }
