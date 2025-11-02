@@ -54,6 +54,7 @@ const AssetListModal: React.FC<AssetListModalProps> = ({ isOpen = false, onClose
             className="flex-1 outline-0"
             placeholder="Search by name, symbol or address"
             onChange={e => setSearchQuery(e.target.value)}
+            value={searchQuery}
           />
         </div>
         <div className="mt-4 flex flex-col justify-center items-center w-full gap-3 py-3 overflow-y-auto h-[calc(100%-22px)]">
