@@ -39,7 +39,7 @@ export const NFPM: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x24e95fe9fF4D4F988911cfd9A5D9443b3E640C22',
 };
 export const AUTO_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0x037A4493CC949Ad4f9dbf8CcAeF558B6DEd26218',
+  [Chains.FLUENT_TESTNET]: '0x889CbB69AF75B87dbD50cC93946a2037Cd378995',
 };
 export const V2_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x57953bB66b17032DeA780e7e078bc887F6Bae9Bc',
