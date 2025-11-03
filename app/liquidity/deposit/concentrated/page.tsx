@@ -364,6 +364,8 @@ export default function ConcentratedLiquidity() {
             amount1={amount1}
             feeTier={feeTier}
             onRangeChange={handleRangeChange}
+            tvl={poolInfo?.reserveUSD}
+            earnings={poolInfo ? parseFloat(poolInfo.totalBribesUSD) + parseFloat(poolInfo.totalFeesUSD) : 0}
           />
         </div>
       </div>

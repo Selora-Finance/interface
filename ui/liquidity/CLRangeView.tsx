@@ -21,6 +21,8 @@ interface CLRangeViewProps {
   amount0?: string;
   amount1?: string;
   feeTier?: string;
+  tvl?: number | string;
+  earnings?: number | string;
   onRangeChange?: (min: number, max: number) => void;
 }
 
@@ -32,7 +34,9 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
   currentPrice = 0.00002454738,
   amount0 = '0',
   amount1 = '0',
-  feeTier = '0.25',
+  feeTier = '0.01',
+  tvl = 0,
+  earnings = 0,
   onRangeChange,
 }) => {
   const [theme] = useAtom(themeAtom);
@@ -221,11 +225,15 @@ const CLRangeView: React.FC<CLRangeViewProps> = ({
           <div className="w-full flex flex-col gap-3 pt-4">
             <div className="w-full justify-between items-center flex gap-3">
               <span className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>TVL</span>
-              <span className={`${isMobile ? 'text-sm' : 'text-base'} font-normal`}>$4,429,338.56</span>
+              <span className={`${isMobile ? 'text-sm' : 'text-base'} font-normal`}>
+                {formatNumber(tvl, undefined, 4, true)}
+              </span>
             </div>
             <div className="w-full justify-between items-center flex gap-3">
               <span className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>Est. earnings</span>
-              <span className={`${isMobile ? 'text-sm' : 'text-base'} font-normal`}>$0.00</span>
+              <span className={`${isMobile ? 'text-sm' : 'text-base'} font-normal`}>
+                {formatNumber(earnings, undefined, 4, true)}
+              </span>
             </div>
             <div className="w-full justify-between items-center flex gap-3">
               <span className={`${isMobile ? 'text-sm' : 'text-base'} text-gray-500`}>Current Fee Tier</span>

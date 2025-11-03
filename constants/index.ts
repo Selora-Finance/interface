@@ -39,13 +39,13 @@ export const NFPM: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x24e95fe9fF4D4F988911cfd9A5D9443b3E640C22',
 };
 export const AUTO_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0x889CbB69AF75B87dbD50cC93946a2037Cd378995',
+  [Chains.FLUENT_TESTNET]: '0xD594CF32f145b8808ACf29d94af8243A7b86c72D',
 };
 export const V2_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0x57953bB66b17032DeA780e7e078bc887F6Bae9Bc',
+  [Chains.FLUENT_TESTNET]: '0xAc510a22bB48F12c9cb1099aAe99612600266D6D',
 };
 export const V3_SWAP_EXECUTORS: { [key: number]: `0x${string}` } = {
-  [Chains.FLUENT_TESTNET]: '0xcaBcFED4a3F7420B11133D31fF79A57353234D91',
+  [Chains.FLUENT_TESTNET]: '0x5f302730D6bebD717D30b49D0be3CED60591Cb3e',
 };
 export const WETH: { [key: number]: `0x${string}` } = {
   [Chains.FLUENT_TESTNET]: '0x3d38E57b5d23c3881AffB8BC0978d5E0bd96c1C6',
