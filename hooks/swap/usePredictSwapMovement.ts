@@ -12,6 +12,7 @@ function usePredictSwapMovement(
   token0: Address,
   token1: Address,
   amountIn: bigint,
+  enabled: boolean = true,
   refetchInterval: number | false = false,
 ) {
   const [routerType] = useAtom(routerTypeAtom);
@@ -40,7 +41,7 @@ function usePredictSwapMovement(
     functionName: 'findBestRoute',
     args: [t0, t1, amountIn],
     address: routerAddress,
-    query: { refetchInterval, enabled: token0 !== zeroAddress && token1 !== zeroAddress },
+    query: { refetchInterval, enabled: token0 !== zeroAddress && token1 !== zeroAddress && enabled },
   });
 
   return { data: data || [], isLoading: isFetching };

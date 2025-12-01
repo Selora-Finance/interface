@@ -22,8 +22,8 @@ interface MainSwapViewProps {
   onInitiateButtonClick?: () => void;
   token0Balance?: number | string;
   token1Balance?: number | string;
-  token0BalanceUSD?: number | string;
-  token1BalanceUSD?: number | string;
+  token0AmountUSD?: number | string;
+  token1AmountUSD?: number | string;
   isLoading?: boolean;
   needsApproval?: boolean;
   onAmount0Change?: (value: string) => void;
@@ -31,6 +31,7 @@ interface MainSwapViewProps {
   amount0?: string;
   amount1?: string;
   currentPrice?: number;
+  fallBackSubmitButtonText?: string;
 }
 
 const MainSwapView: React.FC<MainSwapViewProps> = ({
@@ -43,8 +44,8 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
   onInitiateButtonClick,
   token0Balance = 0,
   token1Balance = 0,
-  token0BalanceUSD = 0,
-  token1BalanceUSD = 0,
+  token0AmountUSD = 0,
+  token1AmountUSD = 0,
   isLoading = false,
   needsApproval,
   onAmount0Change,
@@ -52,6 +53,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
   amount0 = '0',
   amount1 = '0',
   currentPrice = 0,
+  fallBackSubmitButtonText = '',
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
@@ -146,7 +148,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
             <div className="flex justify-end items-center w-full">
               <span className="text-sm text-gray-500">
                 {' '}
-                {formatNumber(token0BalanceUSD, undefined, undefined, true)}
+                {formatNumber(token0AmountUSD, undefined, undefined, true)}
               </span>
             </div>
           </div>
@@ -204,7 +206,7 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
             <div className="flex justify-end items-center w-full">
               <span className="text-sm text-gray-500">
                 {' '}
-                {formatNumber(token1BalanceUSD, undefined, undefined, true)}
+                {formatNumber(token1AmountUSD, undefined, undefined, true)}
               </span>
             </div>
           </div>
@@ -214,11 +216,19 @@ const MainSwapView: React.FC<MainSwapViewProps> = ({
             className="w-full py-5 gap-2 flex justify-center items-center"
             onClick={onInitiateButtonClick}
           >
-            {balanceIsSufficient ? (
-              <>{needsApproval ? `Approve to spend ${asset0?.symbol}` : 'Swap'}</>
-            ) : (
-              'Insufficient Balance'
-            )}
+            <>
+              {fallBackSubmitButtonText ? (
+                fallBackSubmitButtonText
+              ) : (
+                <>
+                  {balanceIsSufficient ? (
+                    <>{needsApproval ? `Approve to spend ${asset0?.symbol}` : 'Swap'}</>
+                  ) : (
+                    'Insufficient Balance'
+                  )}
+                </>
+              )}
+            </>
             {isLoading && <Spinner size="sm" />}
           </Button>
         </div>

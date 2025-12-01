@@ -52,7 +52,9 @@ const SwapDetails: React.FC<SwapDetailsProps> = ({ asset0, asset1, asset1PerAsse
           </div>
           <div className="w-full justify-between items-center flex gap-3">
             <span className="text-sm text-gray-500">Minimum Received</span>
-            <span className="text-sm">{minReceived ? `${formatNumber(minReceived)} ${asset1?.symbol}` : '--'}</span>
+            <span className="text-sm">
+              {minReceived ? `${formatNumber(minReceived)} ${asset1?.symbol ?? ''}` : '--'}
+            </span>
           </div>
           <div className="w-full justify-between items-center flex gap-3">
             <span className="text-sm text-gray-500">Router</span>

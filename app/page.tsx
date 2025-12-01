@@ -7,7 +7,7 @@ import Stats from '@/ui/homepage/Stats';
 
 export default function Home() {
   return (
-    <div className="flex flex-col justify-start items-center px-4 gap-10 py-12 my-48">
+    <div className="flex flex-col justify-start items-center px-4 gap-10 py-8 my-8 md:my-24">
       <Hero />
       <Stats />
       <HowItWorks />

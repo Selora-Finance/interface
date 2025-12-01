@@ -154,8 +154,16 @@ export default function StandardLiquidity() {
   const token1Balance = useGetBalance(address1, REFETCH_INTERVALS);
 
   // Market value
-  const [token0BalanceUSD] = useMarketValueUSD(address0, token0Balance, REFETCH_INTERVALS);
-  const [token1BalanceUSD] = useMarketValueUSD(address1, token1Balance, REFETCH_INTERVALS);
+  const [token0AmountUSD] = useMarketValueUSD(
+    address0,
+    parseUnits(amount0 ?? '0', asset0?.decimals ?? 18),
+    REFETCH_INTERVALS,
+  );
+  const [token1AmountUSD] = useMarketValueUSD(
+    address1,
+    parseUnits(amount1 ?? '0', asset1?.decimals ?? 18),
+    REFETCH_INTERVALS,
+  );
 
   // eslint-disable-next-line react-hooks/set-state-in-effect
   useEffect(() => handleQueryParamsChange(), [handleQueryParamsChange]);
@@ -173,8 +181,8 @@ export default function StandardLiquidity() {
           asset1={asset1}
           token0Balance={formatUnits(token0Balance, asset0?.decimals ?? 18)}
           token1Balance={formatUnits(token1Balance, asset1?.decimals ?? 18)}
-          token0BalanceUSD={formatUnits(token0BalanceUSD, 18)}
-          token1BalanceUSD={formatUnits(token1BalanceUSD, 18)}
+          token0AmountUSD={formatUnits(token0AmountUSD, 18)}
+          token1AmountUSD={formatUnits(token1AmountUSD, 18)}
           onSelector0Click={() => setShowModal0(true)}
           onSelector1Click={() => setShowModal1(true)}
           onBackClick={handleBackClick}

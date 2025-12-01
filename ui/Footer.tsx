@@ -30,7 +30,7 @@ const Footer: React.FC = () => {
               <a href="https://x.com/Selora_Fi" target="_blank">
                 <FaXTwitter size={30} />
               </a>
-              <a href="https://discord.gg/FgUyS6nnSx" target="_blank">
+              <a href="https://discord.gg/BhRYuzbbMR" target="_blank">
                 <FaDiscord size={30} />
               </a>
               <button
@@ -44,7 +44,7 @@ const Footer: React.FC = () => {
 
           {/* Company Description */}
           <p className="text-sm max-w-2xl mb-29 leading-relaxed ">
-            Selora is the central trading and liquidity marketplace built on Fluent. It uses Vc(3,3) model to align
+            Selora is the central trading and liquidity marketplace built on Fluent. It uses the ve(3,3) model to align
             incentives between liquidity providers, traders, and protocols.
           </p>
 
@@ -55,12 +55,20 @@ const Footer: React.FC = () => {
           <div className="flex flex-col-reverse gap-4 md:flex-row justify-start md:justify-between items-start md:items-center text-sm">
             <p className="mb-2 md:mb-0">© 2025 Selora Finance. All rights reserved.</p>
             <div className="flex space-x-8 md:space-x-4">
-              <Link href="#" className="hover:underline">
+              <a
+                href="https://selora.gitbook.io/selora/information/terms-of-service"
+                className="hover:underline"
+                target="_blank"
+              >
                 Terms of Services
-              </Link>
-              <Link href="#" className="hover:underline">
+              </a>
+              <a
+                href="https://selora.gitbook.io/selora/information/terms-of-service"
+                className="hover:underline"
+                target="_blank"
+              >
                 Privacy Policy
-              </Link>
+              </a>
             </div>
           </div>
         </div>
