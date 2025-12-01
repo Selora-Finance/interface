@@ -18,8 +18,8 @@ interface StandardLiquidityViewProps {
   asset1?: AssetType | null;
   token0Balance?: number | string;
   token1Balance?: number | string;
-  token0BalanceUSD?: number | string;
-  token1BalanceUSD?: number | string;
+  token0AmountUSD?: number | string;
+  token1AmountUSD?: number | string;
   onSelector0Click?: () => void;
   onSelector1Click?: () => void;
   onBackClick?: () => void;
@@ -59,8 +59,8 @@ const StandardLiquidityView: React.FC<StandardLiquidityViewProps> = ({
   isLoading,
   token0Balance = 0,
   token1Balance = 0,
-  token0BalanceUSD = 0,
-  token1BalanceUSD = 0,
+  token0AmountUSD = 0,
+  token1AmountUSD = 0,
 }) => {
   const [theme] = useAtom(themeAtom);
   const isDarkMode = useMemo(() => theme === Themes.DARK, [theme]);
@@ -183,7 +183,7 @@ const StandardLiquidityView: React.FC<StandardLiquidityViewProps> = ({
               />
             </div>
             <span className="text-xs text-gray-500 self-end">
-              {formatNumber(token0BalanceUSD, undefined, undefined, true)}
+              {formatNumber(token0AmountUSD, undefined, undefined, true)}
             </span>
           </div>
 
@@ -232,7 +232,7 @@ const StandardLiquidityView: React.FC<StandardLiquidityViewProps> = ({
               />
             </div>
             <span className="text-xs text-gray-500 self-end">
-              {formatNumber(token1BalanceUSD, undefined, undefined, true)}
+              {formatNumber(token1AmountUSD, undefined, undefined, true)}
             </span>
           </div>
 

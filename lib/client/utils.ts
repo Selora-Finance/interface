@@ -8,6 +8,7 @@ import { twMerge } from 'tailwind-merge';
  * cn - className helper
  * Combines multiple class strings, removes duplicates, and merges Tailwind classes.
  */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function cn(...inputs: any[]) {
   return twMerge(clsx(inputs));
 }
@@ -56,7 +57,7 @@ export function formatNumber(
   opts.maximumSignificantDigits = 6;
   opts.notation = 'compact';
   opts.compactDisplay = 'short';
-  opts.useGrouping = true;
+  opts.useGrouping = num < 1000000000000;
 
   if (inUSD) {
     opts.style = 'currency';

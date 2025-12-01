@@ -52,7 +52,7 @@ const ConcentratedLiquidityView: React.FC<ConcentratedLiquidityViewProps> = ({
   asset1,
   onSelector0Click,
   onSelector1Click,
-  feeTier = '0.25',
+  feeTier = '0.3',
   onFeeTierChange,
   rangeType = 'preset',
   onRangeTypeChange,

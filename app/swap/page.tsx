@@ -3,11 +3,13 @@
 import {
   AUTO_SWAP_EXECUTORS,
   BI_ZERO,
+  ETHER,
   EXPLORERS,
   REFETCH_INTERVALS,
   RouterType,
   V2_SWAP_EXECUTORS,
   V3_SWAP_EXECUTORS,
+  WETH,
 } from '@/constants';
 import { useAssetList } from '@/context/assets';
 import useAutoSwap from '@/hooks/swap/useAutoSwap';
@@ -18,6 +20,7 @@ import useApproveSpend from '@/hooks/useApproveSpend';
 import useGetAllowance from '@/hooks/useGetAllowance';
 import useGetBalance from '@/hooks/useGetBalance';
 import useMarketValueUSD from '@/hooks/useMarketValueUSD';
+import useWETHTx from '@/hooks/useWETHTx';
 import { applySlippage } from '@/lib/client/utils';
 import { routerTypeAtom, slippageToleranceAtom } from '@/store';
 import AssetListModal from '@/ui/AssetListModal';
@@ -28,7 +31,7 @@ import TransactionErrorModal from '@/ui/TransactionErrorModal';
 import TransactionSuccessModal from '@/ui/TransactionSuccessModal';
 import { useAtom } from 'jotai';
 import { useCallback, useMemo, useState } from 'react';
-import { Address, formatUnits, getAddress, parseUnits, zeroAddress } from 'viem';
+import { Address, formatUnits, getAddress, parseEther, parseUnits, zeroAddress } from 'viem';
 import { useChainId } from 'wagmi';
 
 export default function Swap() {
@@ -66,8 +69,16 @@ export default function Swap() {
   const balance0 = useGetBalance(address0, REFETCH_INTERVALS);
   const balance1 = useGetBalance(address1, REFETCH_INTERVALS);
   // USD equivalents
-  const [balance0USD] = useMarketValueUSD(address0, balance0, REFETCH_INTERVALS);
-  const [balance1USD] = useMarketValueUSD(address1, balance1, REFETCH_INTERVALS);
+  const [amount0USD] = useMarketValueUSD(
+    address0,
+    parseUnits(amount0 ?? '0', asset0?.decimals ?? 18),
+    REFETCH_INTERVALS,
+  );
+  const [amount1USD] = useMarketValueUSD(
+    address1,
+    parseUnits(amount1 ?? '0', asset1?.decimals ?? 18),
+    REFETCH_INTERVALS,
+  );
 
   const chainId = useChainId();
   const autoSwapper = useMemo(() => AUTO_SWAP_EXECUTORS[chainId], [chainId]);
@@ -100,11 +111,42 @@ export default function Swap() {
     }
   }, [amount0Parsed, autoSwapperAllowance, routerType, v2SwapperAllowance, v3SwapperAllowance]);
 
+  // === ETHER <=> WETH === //
+  const weth = useMemo(() => WETH[chainId], [chainId]);
+  const isETHER_WETH = useMemo(
+    () =>
+      (address0.toLowerCase() === ETHER.toLowerCase() && address1.toLowerCase() === weth.toLowerCase()) ||
+      (address0.toLowerCase() === weth.toLowerCase() && address1.toLowerCase() === ETHER.toLowerCase()),
+    [address0, address1, weth],
+  );
+  const isWrap = useMemo(
+    () => isETHER_WETH && address0.toLowerCase() === ETHER.toLowerCase(),
+    [address0, isETHER_WETH],
+  );
+  const { useDeposit, useWithdrawal } = useWETHTx();
+  const depositETH = useDeposit(
+    parseEther(amount0),
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
+  );
+  const unwrapETH = useWithdrawal(
+    parseEther(amount0),
+    hash => {
+      setTransactionPreviewUrl(`${EXPLORERS[chainId]}/tx/${hash}`);
+      setShowSuccess(true);
+    },
+    () => setShowError(true),
+  );
+
   // Swap quote
   const swapQuote = usePredictSwapMovement(
     address0,
     address1,
     parseUnits(amount0, asset0?.decimals ?? 18),
+    !isETHER_WETH,
     REFETCH_INTERVALS,
   );
 
@@ -113,22 +155,31 @@ export default function Swap() {
     address0,
     address1,
     parseUnits('1', asset0?.decimals ?? 18),
+    !isETHER_WETH,
     REFETCH_INTERVALS,
   );
 
   // Formatted unit swap quote
   const formattedUnitQuote = useMemo(
     () =>
-      Number(
-        formatUnits(unitSwapQuote.data[unitSwapQuote.data.length - 1]?.amountOut || BI_ZERO, asset1?.decimals ?? 18),
-      ),
-    [asset1?.decimals, unitSwapQuote.data],
+      !isETHER_WETH
+        ? Number(
+            formatUnits(
+              unitSwapQuote.data[unitSwapQuote.data.length - 1]?.amountOut || BI_ZERO,
+              asset1?.decimals ?? 18,
+            ),
+          )
+        : 1,
+    [asset1?.decimals, isETHER_WETH, unitSwapQuote.data],
   );
 
   // Min received
   const minReceived = useMemo(
-    () => applySlippage(slippage, swapQuote.data[swapQuote.data.length - 1]?.amountOut || BI_ZERO),
-    [slippage, swapQuote.data],
+    () =>
+      !isETHER_WETH
+        ? applySlippage(slippage, swapQuote.data[swapQuote.data.length - 1]?.amountOut || BI_ZERO)
+        : parseEther(amount0),
+    [amount0, isETHER_WETH, slippage, swapQuote.data],
   );
 
   // Swap executions
@@ -167,6 +218,13 @@ export default function Swap() {
   );
 
   const initiateProcess = useCallback(() => {
+    if (isETHER_WETH) {
+      if (isWrap) depositETH.execute();
+      else unwrapETH.execute();
+
+      return;
+    }
+
     switch (routerType) {
       case RouterType.AUTO: {
         if (requiresApproval) autoSwapperApproval.execute();
@@ -187,8 +245,12 @@ export default function Swap() {
   }, [
     autoSwap,
     autoSwapperApproval,
+    depositETH,
+    isETHER_WETH,
+    isWrap,
     requiresApproval,
     routerType,
+    unwrapETH,
     v2Swap,
     v2SwapperApproval,
     v3Swap,
@@ -207,8 +269,8 @@ export default function Swap() {
           onSettingsClick={() => setShowSettings(true)}
           token0Balance={formatUnits(balance0, asset0?.decimals ?? 18)}
           token1Balance={formatUnits(balance1, asset1?.decimals ?? 18)}
-          token0BalanceUSD={formatUnits(balance0USD, 18)}
-          token1BalanceUSD={formatUnits(balance1USD, 18)}
+          token0AmountUSD={formatUnits(amount0USD, 18)}
+          token1AmountUSD={formatUnits(amount1USD, 18)}
           onAmount0Change={setAmount0}
           onAmount1Change={setAmount1}
           needsApproval={requiresApproval}
@@ -216,13 +278,16 @@ export default function Swap() {
           amount0={amount0}
           amount1={amount1}
           currentPrice={formattedUnitQuote}
+          fallBackSubmitButtonText={isETHER_WETH ? (isWrap ? 'Wrap ETH' : 'Unwrap ETH') : ''}
           isLoading={
             autoSwap.isLoading ||
             v2Swap.isLoading ||
             v3Swap.isLoading ||
             v2SwapperApproval.isLoading ||
             v3SwapperApproval.isLoading ||
-            autoSwapperApproval.isLoading
+            autoSwapperApproval.isLoading ||
+            depositETH.isLoading ||
+            unwrapETH.isLoading
           }
         />
         <SwapDetails
@@ -260,6 +325,8 @@ export default function Swap() {
           autoSwap.reset();
           v2Swap.reset();
           v3Swap.reset();
+          depositETH.reset();
+          unwrapETH.reset();
           setShowSuccess(false);
         }}
         show={showSuccess}
@@ -274,6 +341,8 @@ export default function Swap() {
           autoSwap.reset();
           v2Swap.reset();
           v3Swap.reset();
+          depositETH.reset();
+          unwrapETH.reset();
           setShowError(false);
         }}
         show={showError}

@@ -70,7 +70,7 @@ export default function Navbar({ defaultBg = 'bg-gray-800', scrolledBg = 'bg-ora
           <a href="https://x.com/Selora_Fi" target="_blank">
             <FaXTwitter size={30} />
           </a>
-          <a href="https://discord.gg/FgUyS6nnSx" target="_blank">
+          <a href="https://discord.gg/BhRYuzbbMR" target="_blank">
             <FaDiscord size={30} />
           </a>
         </div>
